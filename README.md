@@ -66,6 +66,22 @@ Este proyecto consiste en una aplicación móvil Android y un backend REST para 
 
 ---
 
+## 🎨 Diseños
+
+### 🔐 Login
+
+![Login](mockups/login.png)
+
+### 🏠 Home
+
+![Home](mockups/home.png)
+
+### 📝 Crear Reporte
+
+![Form](mockups/report.png)
+
+---
+
 ## 📌 Estado del Proyecto
 
 En desarrollo 🚧
