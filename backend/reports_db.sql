@@ -2,7 +2,7 @@
 -- TABLE: users
 -- =========================
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,  -- Cambiado de SERIAL a BIGSERIAL
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     national_id VARCHAR(50) UNIQUE NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE users (
 -- TABLE: reports
 -- =========================
 CREATE TABLE reports (
-    id BIGSERIAL PRIMARY KEY,  -- Cambiado de SERIAL a BIGSERIAL
+    id BIGSERIAL PRIMARY KEY,
     description TEXT NOT NULL,
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
@@ -24,7 +24,7 @@ CREATE TABLE reports (
     report_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     category VARCHAR(100),
     status VARCHAR(50),
-    user_id BIGINT,  -- Cambiado de INTEGER a BIGINT
+    user_id BIGINT,
     
     CONSTRAINT fk_report_user
         FOREIGN KEY (user_id)
@@ -36,11 +36,11 @@ CREATE TABLE reports (
 -- TABLE: photos
 -- =========================
 CREATE TABLE photos (
-    id BIGSERIAL PRIMARY KEY,  -- Cambiado de SERIAL a BIGSERIAL
+    id BIGSERIAL PRIMARY KEY,
     url TEXT NOT NULL,
     upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ai_validated BOOLEAN DEFAULT FALSE,
-    report_id BIGINT,  -- Cambiado de INTEGER a BIGINT
+    report_id BIGINT,
 
     CONSTRAINT fk_photo_report
         FOREIGN KEY (report_id)

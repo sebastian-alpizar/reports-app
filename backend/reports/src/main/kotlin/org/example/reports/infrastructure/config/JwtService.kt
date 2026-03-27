@@ -4,11 +4,17 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
 import java.util.*
+import org.springframework.beans.factory.annotation.Value
+
 
 @Service
-class JwtService {
-    private val SECRET = "my-secret-key-my-secret-key-my-secret-key" // mínimo 32 chars
-    private val key = Keys.hmacShaKeyFor(SECRET.toByteArray())
+class JwtService(
+    @Value("\${jwt.secret}") private val secret: String
+) {
+
+    private val key by lazy {
+        Keys.hmacShaKeyFor(secret.toByteArray())
+    }
 
     fun generateToken(email: String): String {
         return Jwts.builder()
