@@ -47,11 +47,3 @@ CREATE TABLE photos (
         REFERENCES reports(id)
         ON DELETE CASCADE
 );
-
--- Índices recomendados
-CREATE INDEX idx_reports_user_id ON reports(user_id);
-CREATE INDEX idx_reports_status ON reports(status);
-CREATE INDEX idx_reports_category ON reports(category);
-CREATE INDEX idx_photos_report_id ON photos(report_id);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_national_id ON users(national_id);
