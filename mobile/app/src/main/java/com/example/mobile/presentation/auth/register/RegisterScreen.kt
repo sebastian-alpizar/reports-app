@@ -32,9 +32,8 @@ fun RegisterScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { padding ->
+    ) {
         RegisterContent(
-            modifier = Modifier.padding(padding),
             viewModel = viewModel,
             navController = navController
         )
