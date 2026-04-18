@@ -21,6 +21,17 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Configuración correcta de ABI filters
+        ndk {
+            abiFilters.clear()
+            abiFilters.addAll(listOf(
+                "armeabi-v7a",
+                "arm64-v8a",
+                "x86",      // Para emuladores x86 de 32 bits
+                "x86_64"    // Para tu emulador actual
+            ))
+        }
     }
 
     buildTypes {
@@ -81,4 +92,13 @@ dependencies {
 
     // ICons
     implementation("androidx.compose.material:material-icons-extended")
+
+    // MapLibre
+    implementation(libs.maplibre.android)
+    // Fused Location Provider
+    implementation(libs.play.services.location)
+    // Permissions
+    implementation(libs.accompanist.permissions)
+    // Coroutines for location updates
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 }

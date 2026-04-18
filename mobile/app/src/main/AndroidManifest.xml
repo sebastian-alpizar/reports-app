@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Permisos para ubicacion (MapLibre) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:name="com.example.mobile.core.ReportsApp"
         android:allowBackup="true"
@@ -15,6 +19,12 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Mobile">
+
+        <!-- Configuración para MapLibre
+        <meta-data
+            android:name="com.maplibre.gl.ACCESS_TOKEN"
+            android:value="" /> -->
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
