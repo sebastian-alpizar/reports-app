@@ -16,10 +16,12 @@ fun AppButton(
     text: String,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled && !isLoading,
         modifier = modifier
             .height(52.dp)
             .clip(RoundedCornerShape(28.dp))

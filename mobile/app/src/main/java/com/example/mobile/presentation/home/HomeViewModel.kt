@@ -1,39 +1,65 @@
 package com.example.mobile.presentation.home
 
+import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import com.example.mobile.domain.model.Location
+import com.example.mobile.domain.model.Report
+import com.example.mobile.domain.usecase.SendReportUseCase
 import com.example.mobile.domain.usecase.location.GetLocationUpdatesUseCase
 import com.example.mobile.domain.usecase.location.HasLocationPermissionUseCase
 import com.example.mobile.presentation.utils.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+data class HomeUiState(
+    val currentLocation: Location? = null,
+    val isLoading: Boolean = true,
+    val shouldRequestPermission: Boolean = false,
+    val showReportModal: Boolean = false
+)
+
+data class ReportFormState(
+    val description: String = "",
+    val selectedImageUri: String? = null,
+    val isSubmitting: Boolean = false
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getLocationUpdatesUseCase: GetLocationUpdatesUseCase,
-    private val hasLocationPermissionUseCase: HasLocationPermissionUseCase
+    private val hasLocationPermissionUseCase: HasLocationPermissionUseCase,
+    private val sendReportUseCase: SendReportUseCase
 ) : ViewModel() {
 
-    private val _currentLocation = MutableStateFlow<Location?>(null)
-    val currentLocation = _currentLocation.asStateFlow()
+    var uiState by mutableStateOf(HomeUiState())
+        private set
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading = _isLoading.asStateFlow()
+    var reportFormState by mutableStateOf(ReportFormState())
+        private set
 
     private val _event = MutableSharedFlow<UiEvent>()
     val event = _event.asSharedFlow()
 
-    private val _shouldRequestPermission = MutableStateFlow(false)
-    val shouldRequestPermission = _shouldRequestPermission.asStateFlow()
+    var shouldCenterMap by mutableStateOf(false)
+        private set
+
+    fun centerOnCurrentLocation() {
+        shouldCenterMap = true
+    }
+
+    fun onMapCentered() {
+        shouldCenterMap = false
+    }
 
     init {
         checkPermissionAndStartUpdates()
@@ -44,8 +70,10 @@ class HomeViewModel @Inject constructor(
             if (hasLocationPermissionUseCase()) {
                 startLocationUpdates()
             } else {
-                _shouldRequestPermission.value = true
-                _isLoading.value = false
+                uiState = uiState.copy(
+                    shouldRequestPermission = true,
+                    isLoading = false
+                )
             }
         }
     }
@@ -58,24 +86,92 @@ class HomeViewModel @Inject constructor(
                         "Error al obtener ubicación: ${exception.message}",
                         true
                     ))
-                    _isLoading.value = false
+                    uiState = uiState.copy(isLoading = false)
                 }
                 .collect { location ->
-                    _currentLocation.value = location
-                    if (_isLoading.value) {
-                        _isLoading.value = false
-                    }
+                    uiState = uiState.copy(
+                        currentLocation = location,
+                        isLoading = false
+                    )
                 }
         }
     }
 
+    fun updateReportDescription(description: String) {
+        reportFormState = reportFormState.copy(
+            description = description,
+        )
+    }
+
+    fun updateSelectedImage(uri: String?) {
+        reportFormState = reportFormState.copy(selectedImageUri = uri)
+    }
+
+    fun toggleReportModal(show: Boolean) {
+        if (!show) {
+            // Limpiar formulario al cerrar
+            reportFormState = ReportFormState()
+        }
+        uiState = uiState.copy(showReportModal = show)
+    }
+
+    fun sendReport(context: Context) {
+        val currentLocation = uiState.currentLocation
+        val description = reportFormState.description
+        val imageUri = reportFormState.selectedImageUri
+
+        if (currentLocation == null) {
+            viewModelScope.launch {
+                _event.emit(UiEvent.ShowSnackbar(
+                    "No se ha obtenido la ubicación aún",
+                    true
+                ))
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            reportFormState = reportFormState.copy(isSubmitting = true)
+
+            val report = Report(
+                location = currentLocation,
+                description = description,
+                imageUri = imageUri
+            )
+
+            println("========== REPORT OBJECT ==========")
+            println("REPORT latitude: ${report.location.latitude}")
+            println("REPORT longitude: ${report.location.longitude}")
+            println("REPORT description: ${report.description}")
+            println("REPORT imageUri: ${report.imageUri}")
+            println("REPORT createdAt: ${report.createdAt}")
+            println("===================================")
+
+            val result = sendReportUseCase(context, report)
+            reportFormState = reportFormState.copy(isSubmitting = false)
+
+            result.fold(
+                onSuccess = {
+                    _event.emit(UiEvent.ReportSubmitted)
+                    toggleReportModal(false)
+                },
+                onFailure = { error ->
+                    _event.emit(UiEvent.ShowSnackbar(
+                        "Error al enviar reporte: ${error.message}",
+                        true
+                    ))
+                }
+            )
+        }
+    }
+
     fun onPermissionGranted() {
-        _shouldRequestPermission.value = false
+        uiState = uiState.copy(shouldRequestPermission = false)
         startLocationUpdates()
     }
 
     fun onPermissionDenied() {
-        _shouldRequestPermission.value = false
+        uiState = uiState.copy(shouldRequestPermission = false)
         viewModelScope.launch {
             _event.emit(UiEvent.ShowSnackbar(
                 "Permiso de ubicación necesario para mostrar el mapa",

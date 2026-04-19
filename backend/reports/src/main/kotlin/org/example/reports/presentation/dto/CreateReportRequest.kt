@@ -5,5 +5,5 @@ data class CreateReportRequest(
     val latitude: Double?,
     val longitude: Double?,
     val approximateLocation: String?,
-    val category: String?
+    val category: String?,
 )

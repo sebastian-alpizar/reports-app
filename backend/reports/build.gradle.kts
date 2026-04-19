@@ -40,6 +40,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+    // Para fotos en Cloudinay
+    implementation("com.cloudinary:cloudinary-http44:1.33.0")
 }
 
 kapt {

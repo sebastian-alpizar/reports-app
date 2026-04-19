@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service
 class DeleteReportUseCase(
     private val reportRepository: ReportRepository
 ) {
-
     fun execute(id: Long) {
         reportRepository.deleteById(id)
     }

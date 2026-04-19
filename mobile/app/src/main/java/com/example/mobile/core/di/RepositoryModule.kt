@@ -2,8 +2,10 @@ package com.example.mobile.core.di
 
 import com.example.mobile.data.repository.AuthRepositoryImpl
 import com.example.mobile.data.repository.LocationRepositoryImpl
+import com.example.mobile.data.repository.ReportRepositoryImpl
 import com.example.mobile.domain.repository.AuthRepository
 import com.example.mobile.domain.repository.LocationRepository
+import com.example.mobile.domain.repository.ReportRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindLocationRepository(
         locationRepositoryImpl: LocationRepositoryImpl
     ): LocationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReportRepository(
+        reportRepositoryImpl: ReportRepositoryImpl
+    ): ReportRepository
 }

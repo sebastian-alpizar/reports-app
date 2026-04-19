@@ -8,5 +8,5 @@ sealed class UiEvent {
     ) : UiEvent()
 
     object NavigateHome : UiEvent()
-
+    data object ReportSubmitted : UiEvent()
 }

@@ -3,10 +3,14 @@ package org.example.reports.presentation.controller
 import org.example.reports.application.usecase.reports.CreateReportUseCase
 import org.example.reports.application.usecase.reports.DeleteReportUseCase
 import org.example.reports.application.usecase.reports.GetReportsUseCase
+import org.example.reports.presentation.dto.ApiResponse
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.example.reports.presentation.dto.ReportResponse
 import org.example.reports.presentation.mapper.ReportDtoMapper
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/reports")
@@ -16,10 +20,26 @@ class ReportController(
     private val deleteReportUseCase: DeleteReportUseCase,
     private val mapper: ReportDtoMapper,
 ) {
-
-    @PostMapping
-    fun createReport(@RequestBody request: CreateReportRequest): ReportResponse {
-        return mapper.toResponse(createReportUseCase.execute(request))
+    @PostMapping(consumes = ["multipart/form-data"])
+    fun createReportWithPhoto(
+        @RequestPart("report") reportData: CreateReportRequest,  // Los datos del reporte como JSON
+        @RequestPart("photo") photo: MultipartFile               // El archivo de la foto
+    ): ResponseEntity<ApiResponse<Unit>> {
+        return try {
+            val request = CreateReportRequest(
+                description = reportData.description,
+                latitude = reportData.latitude,
+                longitude = reportData.longitude,
+                approximateLocation = reportData.approximateLocation,
+                category = reportData.category,
+            )
+            createReportUseCase.execute(request, photo)
+            ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse(message = "Reporte creado exitosamente"))
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse(message = "Error al crear el reporte: ${e.message}"))
+        }
     }
 
     @GetMapping
@@ -40,7 +60,14 @@ class ReportController(
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long) {
+    fun delete(
+        @PathVariable id: Long
+    ): ResponseEntity<ApiResponse<Unit>> {
         deleteReportUseCase.execute(id)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "Reporte eliminado exitosamente"
+            )
+        )
     }
 }

@@ -26,6 +26,10 @@ fun RegisterScreen(
                         popUpTo("register") { inclusive = true }
                     }
                 }
+                UiEvent.ReportSubmitted -> {
+                    // No hace nada aquí porque este evento
+                    // pertenece a HomeScreen, pero Kotlin lo exige
+                }
             }
         }
     }

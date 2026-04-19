@@ -101,4 +101,9 @@ dependencies {
     implementation(libs.accompanist.permissions)
     // Coroutines for location updates
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    // Coil para cargar imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    // Accompanist permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 }
