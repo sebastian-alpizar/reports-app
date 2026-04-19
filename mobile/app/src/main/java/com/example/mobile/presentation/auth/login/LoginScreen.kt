@@ -28,6 +28,10 @@ fun LoginScreen(
                     }
 
                 }
+                UiEvent.ReportSubmitted -> {
+                    // No hace nada aquí porque este evento
+                    // pertenece a HomeScreen, pero Kotlin lo exige
+                }
             }
         }
     }

@@ -1,8 +1,10 @@
 package org.example.reports.presentation.controller
 
 import org.example.reports.application.usecase.auth.LoginUseCase
+import org.example.reports.presentation.dto.ApiResponse
 import org.example.reports.presentation.dto.AuthResponse
 import org.example.reports.presentation.dto.LoginRequest
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -11,8 +13,16 @@ class AuthController(
     private val loginUseCase: LoginUseCase
 ) {
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequest): AuthResponse {
-        val token = loginUseCase.execute(request.email, request.password)
-        return AuthResponse(token)
+    fun login(
+        @RequestBody request: LoginRequest
+    ): ResponseEntity<ApiResponse<AuthResponse>> {
+        val token = loginUseCase.execute(
+            request.email,
+            request.password
+        )
+        return ResponseEntity.ok(
+            ApiResponse(message = "Login exitoso", data = AuthResponse(token)
+            )
+        )
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 class GetUsersUseCase (
     private val userRepository: UserRepository,
 ) {
-    fun getUserByIdU(id: Long): User {
+    fun getUserById(id: Long): User {
         return userRepository.findById(id)
             ?: throw RuntimeException("Usuario no encontrado")
     }

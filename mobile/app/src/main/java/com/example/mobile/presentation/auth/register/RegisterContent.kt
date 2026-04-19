@@ -22,7 +22,6 @@ fun RegisterContent(
 ) {
 
     AppBackground {
-
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -36,7 +35,8 @@ fun RegisterContent(
             Text(
                 text = "Crear cuenta",
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))

@@ -1,25 +1,40 @@
 package org.example.reports.application.usecase.reports
 
 import org.example.reports.application.usecase.users.GetUsersUseCase
+import org.example.reports.domain.model.Photo
 import org.example.reports.domain.model.Report
 import org.example.reports.domain.model.ReportStatus
+import org.example.reports.domain.repository.PhotoRepository
 import org.example.reports.domain.repository.ReportRepository
+import org.example.reports.domain.repository.UserRepository
+import org.example.reports.infrastructure.cloudinary.CloudinaryService
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.springframework.stereotype.Service
 import org.example.reports.infrastructure.security.SpringSecurityUserProvider
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
 class CreateReportUseCase(
     private val reportRepository: ReportRepository,
     private val authProvider: SpringSecurityUserProvider,
-    private val userQueryService: GetUsersUseCase
+    private val userRepository: UserRepository,
+    private val photoRepository: PhotoRepository,
+    private val cloudinaryService: CloudinaryService
 ) {
-
-    fun execute(request: CreateReportRequest): Report {
+    @Transactional(rollbackFor = [Exception::class])
+    fun execute(request: CreateReportRequest, photo: MultipartFile) {
         val email = authProvider.getCurrentUserEmail()
-        val user = userQueryService.getUserByEmail(email)
 
+        val user = userRepository.findByEmail(email)
+            ?: throw RuntimeException("Usuario no encontrado")
+
+        val photoUrl = try {
+            cloudinaryService.uploadPhoto(photo)
+        } catch (e: Exception) {
+            throw RuntimeException("Error al cargar la foto: ${e.message}", e)
+        }
         val report = Report(
             id = 0,
             description = request.description,
@@ -31,7 +46,14 @@ class CreateReportUseCase(
             status = ReportStatus.PENDING,
             user = user
         )
-
-        return reportRepository.save(report)
+        val savedReport = reportRepository.save(report)
+        val photo = Photo(
+            id = 0,
+            url = photoUrl,
+            uploadDate = LocalDateTime.now(),
+            aiValidated = false,
+            report = savedReport
+        )
+        photoRepository.save(photo)
     }
 }

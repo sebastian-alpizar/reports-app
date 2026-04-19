@@ -27,9 +27,16 @@ fun AppTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.White.copy(alpha = 0.5f),
             unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+
             focusedLabelColor = Color.White.copy(alpha = 0.9f),
             unfocusedLabelColor = Color.White.copy(alpha = 0.6f),
-            cursorColor = Color.White
+
+            cursorColor = Color.White,
+
+            focusedContainerColor = Color.White.copy(alpha = 0.20f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.20f),
+            disabledContainerColor = Color.White.copy(alpha = 0.20f),
+            errorContainerColor = Color.White.copy(alpha = 0.20f)
         ),
         shape = RoundedCornerShape(16.dp)
     )
