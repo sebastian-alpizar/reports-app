@@ -23,7 +23,7 @@ class AuthRepositoryImpl @Inject constructor(
                 LoginRequest(email, password)
             )
 
-            Result.success(response.token)
+            Result.success(response.data.token)
 
         } catch (e: HttpException) {
 
@@ -49,7 +49,7 @@ class AuthRepositoryImpl @Inject constructor(
             val response = api.register(
                 RegisterRequest(name, email, nationalId, password)
             )
-            Result.success(response.token)
+            Result.success(response.data.token)
 
         } catch (e: HttpException) {
             val message = parseError(e)

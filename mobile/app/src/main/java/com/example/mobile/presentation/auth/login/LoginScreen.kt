@@ -1,26 +1,30 @@
 package com.example.mobile.presentation.auth.login
 
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.mobile.presentation.components.snackbar.AppSnackbar
+import com.example.mobile.presentation.components.snackbar.SnackbarState
 import com.example.mobile.presentation.utils.UiEvent
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarState = remember { SnackbarState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(true) {
         viewModel.event.collect { event ->
 
             when (event) {
                 is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        event.message
-                    )
+                    snackbarState.show(event.message, event.isError)
                 }
                 UiEvent.NavigateHome -> {
                     navController.navigate("home") {
@@ -28,22 +32,24 @@ fun LoginScreen(
                     }
 
                 }
-                UiEvent.ReportSubmitted -> {
-                    // No hace nada aquí porque este evento
-                    // pertenece a HomeScreen, pero Kotlin lo exige
-                }
             }
         }
     }
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(snackbarHostState)
-        }
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         LoginContent(
             viewModel = viewModel,
-            navController = navController
+            navController = navController,
+        )
+        AppSnackbar(
+            message = snackbarState.message,
+            isError = snackbarState.isError,
+            visible = snackbarState.isVisible,
+            onDismiss = {
+                scope.launch {
+                    snackbarState.dismiss()
+                }
+            }
         )
     }
 }

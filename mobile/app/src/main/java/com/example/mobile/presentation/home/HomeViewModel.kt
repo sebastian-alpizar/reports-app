@@ -29,9 +29,12 @@ data class HomeUiState(
 )
 
 data class ReportFormState(
-    val description: String = "",
-    val selectedImageUri: String? = null,
-    val isSubmitting: Boolean = false
+    var description: String = "",
+    var selectedImageUri: String? = null,
+    val isSubmitting: Boolean = false,
+    // errores
+    val descriptionError: String? = null,
+    val imageError: String? = null
 )
 
 @HiltViewModel
@@ -97,16 +100,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateReportDescription(description: String) {
-        reportFormState = reportFormState.copy(
-            description = description,
-        )
-    }
-
-    fun updateSelectedImage(uri: String?) {
-        reportFormState = reportFormState.copy(selectedImageUri = uri)
-    }
-
     fun toggleReportModal(show: Boolean) {
         if (!show) {
             // Limpiar formulario al cerrar
@@ -116,6 +109,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun sendReport(context: Context) {
+        if (!validateReportForm()) return
+
         val currentLocation = uiState.currentLocation
         val description = reportFormState.description
         val imageUri = reportFormState.selectedImageUri
@@ -150,9 +145,16 @@ class HomeViewModel @Inject constructor(
             val result = sendReportUseCase(context, report)
             reportFormState = reportFormState.copy(isSubmitting = false)
 
+            println("REPORT response: ${result}")
+
+
+
             result.fold(
                 onSuccess = {
-                    _event.emit(UiEvent.ReportSubmitted)
+                    _event.emit(UiEvent.ShowSnackbar(
+                        "Reporte enviado exitosamente",
+                        false
+                    ))
                     toggleReportModal(false)
                 },
                 onFailure = { error ->
@@ -178,5 +180,38 @@ class HomeViewModel @Inject constructor(
                 true
             ))
         }
+    }
+
+    fun updateReportDescription(description: String) {
+        reportFormState = reportFormState.copy(
+            description = description,
+            descriptionError = null
+        )
+    }
+
+    fun updateSelectedImage(uri: String?) {
+        reportFormState = reportFormState.copy(
+            selectedImageUri = uri,
+            imageError = null
+        )
+    }
+
+    private fun validateReportForm(): Boolean {
+        val descriptionError =
+            if (reportFormState.description.isBlank())
+                "La descripción es obligatoria"
+            else null
+
+        val imageError =
+            if (reportFormState.selectedImageUri.isNullOrBlank())
+                "Debes seleccionar una imagen"
+            else null
+
+        reportFormState = reportFormState.copy(
+            descriptionError = descriptionError,
+            imageError = imageError
+        )
+
+        return descriptionError == null && imageError == null
     }
 }

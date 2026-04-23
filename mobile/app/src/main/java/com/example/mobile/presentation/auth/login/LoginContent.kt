@@ -62,29 +62,33 @@ fun LoginContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             AppTextField(
-                value = viewModel.email,
-                onValueChange = { viewModel.email = it },
+                value = viewModel.formState.email,
+                onValueChange = viewModel::updateEmail,
                 label = "Email",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.emailError != null
             )
 
             viewModel.formState.emailError?.let {
-                Text(it, color = Color.Red)
+                Text(it, color = Color.Red,
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             AppPasswordField(
-                value = viewModel.password,
-                onValueChange = { viewModel.password = it },
+                value = viewModel.formState.password,
+                onValueChange = viewModel::updatePassword,
                 label = "Contraseña",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.passwordError != null
             )
 
             viewModel.formState.passwordError?.let {
-                Text(it, color = Color.Red)
+                Text(it, color = Color.Red,
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(28.dp))

@@ -18,7 +18,9 @@ import javax.inject.Inject
 
 data class LoginFormState(
     val emailError: String? = null,
-    val passwordError: String? = null
+    val passwordError: String? = null,
+    var email: String = "",
+    var password: String = "",
 )
 
 @HiltViewModel
@@ -28,10 +30,6 @@ class LoginViewModel @Inject constructor(
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator
 ) : ViewModel() {
-    // Inputs
-    var email by mutableStateOf("")
-    var password by mutableStateOf("")
-
     // Form state
     var formState by mutableStateOf(LoginFormState())
 
@@ -40,12 +38,26 @@ class LoginViewModel @Inject constructor(
     private val _event = MutableSharedFlow<UiEvent>()
     val event = _event.asSharedFlow()
 
+    fun updateEmail(email: String) {
+        formState = formState.copy(
+            email = email,
+            emailError = null
+        )
+    }
+
+    fun updatePassword(password: String) {
+        formState = formState.copy(
+            password = password,
+            passwordError = null
+        )
+    }
+
     fun login() {
         if (!validateForm()) return
 
         viewModelScope.launch {
             isLoading = true
-            val result = loginUseCase(email, password)
+            val result = loginUseCase(formState.email, formState.password)
             isLoading = false
 
             result.fold(
@@ -66,9 +78,9 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun validateForm(): Boolean {
-        val emailValidation = emailValidator.validate(email)
-        val passwordValidation = passwordValidator.validate(password)
-        formState = LoginFormState(
+        val emailValidation = emailValidator.validate(formState.email)
+        val passwordValidation = passwordValidator.validate(formState.password)
+        formState = formState.copy(
             emailError = emailValidation,
             passwordError = passwordValidation
         )

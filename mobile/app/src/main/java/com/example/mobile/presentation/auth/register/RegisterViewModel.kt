@@ -16,7 +16,12 @@ data class RegisterFormState(
     val nameError: String? = null,
     val emailError: String? = null,
     val nationalIdError: String? = null,
-    val passwordError: String? = null
+    val passwordError: String? = null,
+
+    var name: String = "",
+    var email: String = "",
+    var nationalId: String = "",
+    var password: String = ""
 )
 
 @HiltViewModel
@@ -24,11 +29,6 @@ class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val registerValidator: RegisterValidator
 ) : ViewModel() {
-
-    var name by mutableStateOf("")
-    var email by mutableStateOf("")
-    var nationalId by mutableStateOf("")
-    var password by mutableStateOf("")
     var isLoading by mutableStateOf(false)
 
     var formState by mutableStateOf(RegisterFormState())
@@ -36,25 +36,52 @@ class RegisterViewModel @Inject constructor(
     private val _event = MutableSharedFlow<UiEvent>()
     val event = _event.asSharedFlow()
 
+    fun updateName(name: String) {
+        formState = formState.copy(
+            name = name,
+            nameError = null
+        )
+    }
+
+    fun updateEmail(email: String) {
+        formState = formState.copy(
+            email = email,
+            emailError = null
+        )
+    }
+
+    fun updateNationalId(nationalId: String) {
+        formState = formState.copy(
+            nationalId = nationalId,
+            nationalIdError = null
+        )
+    }
+
+    fun updatePassword(password: String) {
+        formState = formState.copy(
+            password = password,
+            passwordError = null
+        )
+    }
+
     fun register() {
         if (!validateForm()) return
-
-        formState = RegisterFormState()
 
         viewModelScope.launch {
             isLoading = true
             val result = registerUseCase(
-                name,
-                email,
-                nationalId,
-                password
+                formState.name,
+                formState.email,
+                formState.nationalId,
+                formState.password
             )
             isLoading = false
             result.fold(
                 onSuccess = {
                     _event.emit(
                         UiEvent.ShowSnackbar(
-                            "Usuario creado correctamente"
+                            "Usuario creado correctamente",
+                            false
                         )
                     )
                     _event.emit(UiEvent.NavigateHome)
@@ -73,13 +100,18 @@ class RegisterViewModel @Inject constructor(
 
     private fun validateForm(): Boolean {
         val validation = registerValidator.validate(
-            name,
-            email,
-            nationalId,
-            password
+            formState.name,
+            formState.email,
+            formState.nationalId,
+            formState.password
         )
 
-        formState = RegisterFormState()
+        formState = formState.copy(
+            nameError = null,
+            emailError = null,
+            nationalIdError = null,
+            passwordError = null
+        )
 
         if (validation != null) {
             formState = when (validation) {

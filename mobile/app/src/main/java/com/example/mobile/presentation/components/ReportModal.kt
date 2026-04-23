@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
@@ -33,24 +34,30 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import coil.compose.rememberAsyncImagePainter
 import com.example.mobile.domain.model.Location
+import com.example.mobile.presentation.components.snackbar.AppSnackbar
+import com.example.mobile.presentation.components.snackbar.SnackbarState
+import com.example.mobile.presentation.home.ReportFormState
 import com.example.mobile.presentation.utils.GlassModifiers
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.isGranted
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ReportModal(
     currentLocation: Location?,
-    description: String,
-    selectedImageUri: String?,
     isSubmitting: Boolean,
+    snackbarState: SnackbarState,
+    reportFormState: ReportFormState,
     onDescriptionChange: (String) -> Unit,
     onImageSelected: (String?) -> Unit,
     onSubmit: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     // Permission states
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -91,178 +98,233 @@ fun ReportModal(
         )
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(
+            AppSnackbar(
+                message = snackbarState.message,
+                isError = snackbarState.isError,
+                visible = snackbarState.isVisible,
+                onDismiss = {
+                    scope.launch {
+                        snackbarState.dismiss()
+                    }
+                }
+            )
+
+            Box(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(24.dp)
                     .clip(RoundedCornerShape(32.dp))
                     .then(GlassModifiers.glassCard())
-                    .padding(28.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Título
-                Text(
-                    text = "Reportar Accidente",
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // Ubicación actual
-                Surface(
+                // Botón de cerrar (X) en la esquina superior derecha
+                IconButton(
+                    onClick = onDismiss,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color.White.copy(alpha = 0.20f)
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp)
+                        .size(32.dp)
                 ) {
-                    Row(
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cerrar",
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                // Contenido principal
+                Column(
+                    modifier = Modifier
+                        .padding(28.dp)
+                        .padding(top = 8.dp), // Espacio extra por la X
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Título
+                    Text(
+                        text = "Reportar Accidente",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    // Ubicación actual
+                    Surface(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color.White.copy(alpha = 0.20f)
                     ) {
-                        Icon(
-                            Icons.Default.LocationOn,
-                            contentDescription = "Ubicación",
-                            tint = Color(0xFF7C3AED)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column {
-                            Text(
-                                text = "Ubicación actual",
-                                fontSize = 12.sp,
-                                color = Color.White
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.LocationOn,
+                                contentDescription = "Ubicación",
+                                tint = Color(0xFF7C3AED)
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text(
+                                    text = "Ubicación actual",
+                                    fontSize = 12.sp,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = if (currentLocation != null)
+                                        "${currentLocation.latitude}, ${currentLocation.longitude}"
+                                    else
+                                        "Obteniendo ubicación...",
+                                    fontSize = 13.sp,
+                                    color = Color(0xFF7C3AED)
+                                )
+                            }
+                        }
+                    }
+
+                    // Campo de descripción
+                    AppTextField(
+                        value = reportFormState.description,
+                        onValueChange = { onDescriptionChange(it) },
+                        label = "Descripción",
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = reportFormState.descriptionError != null
+                    )
+
+                    reportFormState.descriptionError?.let {
+                        Text(
+                            text = it,
+                            color = Color.Red,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Botones de imagen
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+//                                .padding(bottom = 14.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            // Botón Cámara
+                            OutlinedButton(
+                                onClick = {
+                                    handleCameraClick(
+                                        context = context,
+                                        permissionState = cameraPermissionState,
+                                        launcher = cameraLauncher,
+                                        onTempUriCreated = {
+                                            cameraImageUri = it
+                                        }
+                                    )
+                                },
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White.copy(alpha = 0.20f)
+                                ),
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.CameraAlt,
+                                    contentDescription = "Cámara",
+                                    tint = Color(0xFF7C3AED)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Cámara", color = Color.White.copy(alpha = 0.8f))
+                            }
+
+                            // Botón Galería
+                            OutlinedButton(
+                                onClick = {
+                                    handleGalleryClick(
+                                        permissionState = galleryPermissionState,
+                                        launcher = galleryLauncher
+                                    )
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White.copy(alpha = 0.20f)
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Image,
+                                    contentDescription = "Galería",
+                                    tint = Color(0xFF7C3AED)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Galería", color = Color.White.copy(alpha = 0.8f))
+                            }
+                        }
+                        reportFormState.imageError?.let {
                             Text(
-                                text = if (currentLocation != null)
-                                    "${currentLocation.latitude}, ${currentLocation.longitude}"
-                                else
-                                    "Obteniendo ubicación...",
-                                fontSize = 13.sp,
-                                color = Color(0xFF7C3AED)
+                                text = it,
+                                color = Color.Red,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp)
                             )
                         }
                     }
-                }
 
-                // Campo de descripción
-                AppTextField(
-                    value = description,
-                    onValueChange = onDescriptionChange,
-                    label = "Descripción",
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Botones de imagen
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Botón Cámara
-                    OutlinedButton(
-                        onClick = {
-                            handleCameraClick(
-                                context = context,
-                                permissionState = cameraPermissionState,
-                                launcher = cameraLauncher,
-                                onTempUriCreated = {
-                                    cameraImageUri = it
-                                }
-                            )
-                        },
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White.copy(alpha = 0.20f)
-                        ),
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.CameraAlt,
-                            contentDescription = "Cámara",
-                            tint = Color(0xFF7C3AED)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Cámara", color = Color.White.copy(alpha = 0.8f))
-                    }
-
-                    // Botón Galería
-                    OutlinedButton(
-                        onClick = {
-                            handleGalleryClick(
-                                permissionState = galleryPermissionState,
-                                launcher = galleryLauncher
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White.copy(alpha = 0.20f)
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Image,
-                            contentDescription = "Galería",
-                            tint = Color(0xFF7C3AED)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Galería", color = Color.White.copy(alpha = 0.8f))
-                    }
-                }
-
-                // Vista previa de la imagen seleccionada
-                selectedImageUri?.let { imageUri ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .padding(bottom = 16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF2C2B2E))
-                            .clickable {
-                                onImageSelected(null)
-                            }
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(imageUri),
-                            contentDescription = "Imagen seleccionada",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                    // Vista previa de la imagen seleccionada
+                    reportFormState.selectedImageUri?.let { imageUri ->
                         Box(
                             modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(8.dp)
-                                .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
-                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .padding(bottom = 16.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF2C2B2E))
+                                .clickable {
+                                    onImageSelected(null)
+                                }
                         ) {
-                            Text(
-                                text = "✕",
-                                color = Color.White,
-                                fontSize = 12.sp
+                            Image(
+                                painter = rememberAsyncImagePainter(imageUri),
+                                contentDescription = "Imagen seleccionada",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                                    .background(
+                                        Color.Black.copy(alpha = 0.6f),
+                                        RoundedCornerShape(4.dp)
+                                    )
+                                    .padding(4.dp)
+                            ) {
+                                Text(
+                                    text = "✕",
+                                    color = Color.White,
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                // Botón Enviar
-                AppButton(
-                    text = "Enviar Reporte",
-                    isLoading = isSubmitting,
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = currentLocation != null && !isSubmitting
-                ) {
-                    onSubmit()
+                    // Botón Enviar
+                    AppButton(
+                        text = "Enviar Reporte",
+                        isLoading = isSubmitting,
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        enabled = currentLocation != null && !isSubmitting
+                    ) {
+                        onSubmit()
+                    }
                 }
             }
         }

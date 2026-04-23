@@ -57,7 +57,7 @@ class GlobalExceptionHandler {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
                 ApiResponse(
-                    message = "Error interno en el servidor: ${ex.message}"
+                    message = ex.message ?: "Error en el servidor"
                 )
             )
     }
