@@ -1,18 +1,26 @@
 package com.example.mobile.data.remote.api
 
-import com.example.mobile.data.remote.dto.ReportRequest
+
+import com.example.mobile.data.remote.dto.ReportResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.http.Body
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 
 interface ReportApi {
+
     @Multipart
     @POST("reports")
     suspend fun sendReport(
-        @Part("report") report: RequestBody,  // JSON como string
-        @Part photo: MultipartBody.Part       // Archivo de foto
+        @Part("report") report: RequestBody,
+        @Part photo: MultipartBody.Part
+    )
+
+    @GET("reports")
+    suspend fun getAllReports(): List<ReportResponse>
+
+    @PATCH("reports/{id}/status")
+    suspend fun updateReportStatus(
+        @Path("id") id: Long,
+        @Body body: Map<String, String>
     )
 }

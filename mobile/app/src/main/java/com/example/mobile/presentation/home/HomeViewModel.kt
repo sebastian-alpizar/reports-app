@@ -24,14 +24,15 @@ data class HomeUiState(
     val currentLocation: Location? = null,
     val isLoading: Boolean = true,
     val shouldRequestPermission: Boolean = false,
-    val showReportModal: Boolean = false
+    val showReportModal: Boolean = false,
+    val userName: String = "",   // ← nuevo
+    val userEmail: String = ""   // ← nuevo
 )
 
 data class ReportFormState(
     var description: String = "",
     var selectedImageUri: String? = null,
     val isSubmitting: Boolean = false,
-    // errores
     val descriptionError: String? = null,
     val imageError: String? = null
 )
@@ -56,16 +57,19 @@ class HomeViewModel @Inject constructor(
     var shouldCenterMap by mutableStateOf(false)
         private set
 
-    fun centerOnCurrentLocation() {
-        shouldCenterMap = true
-    }
-
-    fun onMapCentered() {
-        shouldCenterMap = false
-    }
+    fun centerOnCurrentLocation() { shouldCenterMap = true }
+    fun onMapCentered() { shouldCenterMap = false }
 
     init {
         checkPermissionAndStartUpdates()
+        val name  = tokenManager.getUserName()
+        val email = tokenManager.getUserEmail()
+        println("DEBUG nombre: $name")   // ← agregá esto
+        println("DEBUG email: $email")   // ← agregá esto
+        uiState = uiState.copy(
+            userName  = name  ?: "Usuario",
+            userEmail = email ?: ""
+        )
     }
 
     private fun checkPermissionAndStartUpdates() {
@@ -73,10 +77,7 @@ class HomeViewModel @Inject constructor(
             if (hasLocationPermissionUseCase()) {
                 startLocationUpdates()
             } else {
-                uiState = uiState.copy(
-                    shouldRequestPermission = true,
-                    isLoading = false
-                )
+                uiState = uiState.copy(shouldRequestPermission = true, isLoading = false)
             }
         }
     }
@@ -85,83 +86,42 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             getLocationUpdatesUseCase()
                 .catch { exception ->
-                    _event.emit(UiEvent.ShowSnackbar(
-                        "Error al obtener ubicación: ${exception.message}",
-                        true
-                    ))
+                    _event.emit(UiEvent.ShowSnackbar("Error al obtener ubicación: ${exception.message}", true))
                     uiState = uiState.copy(isLoading = false)
                 }
                 .collect { location ->
-                    uiState = uiState.copy(
-                        currentLocation = location,
-                        isLoading = false
-                    )
+                    uiState = uiState.copy(currentLocation = location, isLoading = false)
                 }
         }
     }
 
     fun toggleReportModal(show: Boolean) {
-        if (!show) {
-            // Limpiar formulario al cerrar
-            reportFormState = ReportFormState()
-        }
+        if (!show) reportFormState = ReportFormState()
         uiState = uiState.copy(showReportModal = show)
     }
 
     fun sendReport(context: Context) {
         if (!validateReportForm()) return
-
-        val currentLocation = uiState.currentLocation
-        val description = reportFormState.description
-        val imageUri = reportFormState.selectedImageUri
-
-        if (currentLocation == null) {
-            viewModelScope.launch {
-                _event.emit(UiEvent.ShowSnackbar(
-                    "No se ha obtenido la ubicación aún",
-                    true
-                ))
-            }
+        val currentLocation = uiState.currentLocation ?: run {
+            viewModelScope.launch { _event.emit(UiEvent.ShowSnackbar("No se ha obtenido la ubicación aún", true)) }
             return
         }
-
         viewModelScope.launch {
             reportFormState = reportFormState.copy(isSubmitting = true)
-
             val report = Report(
                 location = currentLocation,
-                description = description,
-                imageUri = imageUri
+                description = reportFormState.description,
+                imageUri = reportFormState.selectedImageUri
             )
-
-            println("========== REPORT OBJECT ==========")
-            println("REPORT latitude: ${report.location.latitude}")
-            println("REPORT longitude: ${report.location.longitude}")
-            println("REPORT description: ${report.description}")
-            println("REPORT imageUri: ${report.imageUri}")
-            println("REPORT createdAt: ${report.createdAt}")
-            println("===================================")
-
             val result = sendReportUseCase(context, report)
             reportFormState = reportFormState.copy(isSubmitting = false)
-
-            println("REPORT response: ${result}")
-
-
-
             result.fold(
                 onSuccess = {
-                    _event.emit(UiEvent.ShowSnackbar(
-                        "Reporte enviado exitosamente",
-                        false
-                    ))
+                    _event.emit(UiEvent.ShowSnackbar("Reporte enviado exitosamente", false))
                     toggleReportModal(false)
                 },
                 onFailure = { error ->
-                    _event.emit(UiEvent.ShowSnackbar(
-                        "Error al enviar reporte: ${error.message}",
-                        true
-                    ))
+                    _event.emit(UiEvent.ShowSnackbar("Error al enviar reporte: ${error.message}", true))
                 }
             )
         }
@@ -175,49 +135,32 @@ class HomeViewModel @Inject constructor(
     fun onPermissionDenied() {
         uiState = uiState.copy(shouldRequestPermission = false)
         viewModelScope.launch {
-            _event.emit(UiEvent.ShowSnackbar(
-                "Permiso de ubicación necesario para mostrar el mapa",
-                true
-            ))
+            _event.emit(UiEvent.ShowSnackbar("Permiso de ubicación necesario para mostrar el mapa", true))
         }
     }
 
     fun updateReportDescription(description: String) {
-        reportFormState = reportFormState.copy(
-            description = description,
-            descriptionError = null
-        )
+        reportFormState = reportFormState.copy(description = description, descriptionError = null)
     }
 
     fun updateSelectedImage(uri: String?) {
-        reportFormState = reportFormState.copy(
-            selectedImageUri = uri,
-            imageError = null
-        )
+        reportFormState = reportFormState.copy(selectedImageUri = uri, imageError = null)
     }
 
     private fun validateReportForm(): Boolean {
-        val descriptionError =
-            if (reportFormState.description.isBlank())
-                "La descripción es obligatoria"
-            else null
-
-        val imageError =
-            if (reportFormState.selectedImageUri.isNullOrBlank())
-                "Debes seleccionar una imagen"
-            else null
-
-        reportFormState = reportFormState.copy(
-            descriptionError = descriptionError,
-            imageError = imageError
-        )
-
+        val descriptionError = if (reportFormState.description.isBlank()) "La descripción es obligatoria" else null
+        val imageError = if (reportFormState.selectedImageUri.isNullOrBlank()) "Debes seleccionar una imagen" else null
+        reportFormState = reportFormState.copy(descriptionError = descriptionError, imageError = imageError)
         return descriptionError == null && imageError == null
     }
     fun logout() {
         tokenManager.clear()
+<<<<<<< Updated upstream
         viewModelScope.launch {
             _event.emit(UiEvent.NavigateLogin)
         }
+=======
+        viewModelScope.launch { _event.emit(UiEvent.NavigateLogin) }
+>>>>>>> Stashed changes
     }
 }

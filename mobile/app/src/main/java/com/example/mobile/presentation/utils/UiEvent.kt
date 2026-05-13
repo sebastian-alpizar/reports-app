@@ -8,5 +8,9 @@ sealed class UiEvent {
     ) : UiEvent()
 
     object NavigateHome : UiEvent()
+<<<<<<< Updated upstream
     object NavigateLogin : UiEvent()
+=======
+    object NavigateLogin : UiEvent()  // ← agregá esto
+>>>>>>> Stashed changes
 }

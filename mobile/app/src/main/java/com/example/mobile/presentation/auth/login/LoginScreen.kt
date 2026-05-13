@@ -35,6 +35,8 @@ fun LoginScreen(
                         popUpTo(0) { inclusive = true }
                     }
                 }
+
+                UiEvent.NavigateLogin -> { }
             }
         }
     }

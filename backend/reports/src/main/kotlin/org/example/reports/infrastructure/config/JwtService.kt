@@ -6,19 +6,19 @@ import org.springframework.stereotype.Service
 import java.util.*
 import org.springframework.beans.factory.annotation.Value
 
-
 @Service
 class JwtService(
     @Value("\${jwt.secret}") private val secret: String
 ) {
-
     private val key by lazy {
         Keys.hmacShaKeyFor(secret.toByteArray())
     }
 
-    fun generateToken(email: String): String {
+    fun generateToken(email: String, id: Long, name: String): String {
         return Jwts.builder()
             .setSubject(email)
+            .claim("id", id)       // ← nuevo
+            .claim("name", name)   // ← nuevo
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60))
             .signWith(key)

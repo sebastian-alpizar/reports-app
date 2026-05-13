@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16
+
+    container_name: reports-postgres
+
+    restart: always
+
+    environment:
+      POSTGRES_DB: reportsdb
+      POSTGRES_USER: reportsuser
+      POSTGRES_PASSWORD: reportspass
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+
+    container_name: reports-backend
+
+    restart: always
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/reportsdb
+      DB_USERNAME: reportsuser
+      DB_PASSWORD: reportspass
+
+      JWT_SECRET:  mysupersecretjwtkeyparaReportApp2024
+
+      CLOUDINARY_CLOUD_NAME: dmz2knvds
+      CLOUDINARY_API_KEY: 744686633472466
+      CLOUDINARY_API_SECRET: wK190p44-qOla-U-QpN2o1XzI7Q
+
+volumes:
+  postgres_data:
