@@ -31,11 +31,7 @@ fun RegisterScreen(
                         popUpTo("register") { inclusive = true }
                     }
                 }
-<<<<<<< Updated upstream
                 UiEvent.NavigateLogin -> { } // ← agrega esto (no hace nada en register)
-=======
-                UiEvent.NavigateLogin -> { /* no se usa en register */ }
->>>>>>> Stashed changes
             }
         }
     }

@@ -1,3 +1,4 @@
+
 package com.example.mobile.presentation.home
 
 import androidx.compose.foundation.background
@@ -6,12 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-<<<<<<< Updated upstream
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Logout
-=======
 import androidx.compose.material.icons.filled.*
->>>>>>> Stashed changes
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,13 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mobile.presentation.components.ReportMapView
 import com.example.mobile.presentation.components.ReportModal
-<<<<<<< Updated upstream
-import com.example.mobile.presentation.utils.UiEvent
-import com.google.accompanist.permissions.*
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.navigation.NavController
-=======
->>>>>>> Stashed changes
 import com.example.mobile.presentation.components.snackbar.AppSnackbar
 import com.example.mobile.presentation.components.snackbar.SnackbarState
 import com.example.mobile.presentation.utils.UiEvent
@@ -70,12 +59,6 @@ fun HomeScreen(
                         popUpTo(0) { inclusive = true }
                     }
                 }
-
-                UiEvent.NavigateLogin -> {
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
                 else -> {}
             }
         }
@@ -97,7 +80,15 @@ fun HomeScreen(
             AppDrawerContent(
                 userName  = uiState.userName,
                 userEmail = uiState.userEmail,
-                onLogout  = {
+                onHistorial = {
+                    scope.launch { drawerState.close() }
+                    // TODO: navController.navigate("history")
+                },
+                onPerfil = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate("profile")
+                },
+                onLogout = {
                     scope.launch { drawerState.close() }
                     viewModel.logout()
                 }
@@ -127,19 +118,6 @@ fun HomeScreen(
                                 Icon(Icons.Default.CameraAlt, "Reportar", tint = Color.White)
                             }
                         }
-
-                        // FAB: logout
-                        FloatingActionButton(
-                            onClick = { viewModel.logout() },
-                            containerColor = Color(0xFFB00020).copy(alpha = 0.9f),
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Logout,
-                                contentDescription = "Cerrar sesión",
-                                tint = Color.White
-                            )
-                        }
                     }
                 }
             ) { paddingValues ->
@@ -161,7 +139,6 @@ fun HomeScreen(
                                 )
                             }
 
-                            // Botón hamburguesa sobre el mapa
                             IconButton(
                                 onClick = { scope.launch { drawerState.open() } },
                                 modifier = Modifier
@@ -218,6 +195,8 @@ fun HomeScreen(
 private fun AppDrawerContent(
     userName: String,
     userEmail: String,
+    onHistorial: () -> Unit,
+    onPerfil: () -> Unit,
     onLogout: () -> Unit
 ) {
     ModalDrawerSheet(
@@ -225,7 +204,6 @@ private fun AppDrawerContent(
         drawerContainerColor = DrawerBg,
         drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp)
     ) {
-        // Header
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -254,12 +232,11 @@ private fun AppDrawerContent(
         Spacer(Modifier.height(8.dp))
         HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
 
-        // Opciones
         NavigationDrawerItem(
             icon = { Icon(Icons.Default.History, null, tint = Color.White.copy(alpha = 0.7f)) },
             label = { Text("Historial", color = Color.White.copy(alpha = 0.8f)) },
             selected = false,
-            onClick = { /* TODO: navegar a historial */ },
+            onClick = onHistorial,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
         )
@@ -268,7 +245,7 @@ private fun AppDrawerContent(
             icon = { Icon(Icons.Default.Person, null, tint = Color.White.copy(alpha = 0.7f)) },
             label = { Text("Perfil", color = Color.White.copy(alpha = 0.8f)) },
             selected = false,
-            onClick = { /* TODO: navegar a perfil */ },
+            onClick = onPerfil,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
         )
@@ -276,7 +253,6 @@ private fun AppDrawerContent(
         Spacer(Modifier.weight(1f))
         HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
 
-        // Logout
         NavigationDrawerItem(
             icon = { Icon(Icons.AutoMirrored.Filled.Logout, null, tint = Color(0xFFEF5350)) },
             label = { Text("Cerrar sesión", color = Color(0xFFEF5350), fontWeight = FontWeight.Medium) },

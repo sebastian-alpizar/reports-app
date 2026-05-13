@@ -8,6 +8,7 @@ import com.example.mobile.presentation.admin.AdminScreen
 import com.example.mobile.presentation.auth.login.LoginScreen
 import com.example.mobile.presentation.auth.register.RegisterScreen
 import com.example.mobile.presentation.home.HomeScreen
+// import com.example.mobile.presentation.profile.ProfileScreen
 
 @Composable
 fun NavGraph() {
@@ -21,27 +22,23 @@ fun NavGraph() {
             LoginScreen(navController)
         }
 
-
         composable("register") {
             RegisterScreen(navController)
         }
+
         composable("home") {
             HomeScreen(navController)
-<<<<<<< Updated upstream
-        }
-
-        composable("admin") {
-          //  AdminScreen(navController) // ← pasa navController
-=======
->>>>>>> Stashed changes
         }
 
         composable("admin") {
             AdminScreen(navController)
         }
 
-        // TODO: agregar cuando estén listas
+        composable("profile") {
+          //  ProfileScreen(navController)
+        }
+
+        // TODO: agregar cuando esté lista
         // composable("history") { HistoryScreen(navController) }
-        // composable("profile") { ProfileScreen(navController) }
     }
 }

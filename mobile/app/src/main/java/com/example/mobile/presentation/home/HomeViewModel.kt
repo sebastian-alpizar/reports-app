@@ -25,8 +25,8 @@ data class HomeUiState(
     val isLoading: Boolean = true,
     val shouldRequestPermission: Boolean = false,
     val showReportModal: Boolean = false,
-    val userName: String = "",   // ← nuevo
-    val userEmail: String = ""   // ← nuevo
+    val userName: String = "",
+    val userEmail: String = ""
 )
 
 data class ReportFormState(
@@ -62,13 +62,9 @@ class HomeViewModel @Inject constructor(
 
     init {
         checkPermissionAndStartUpdates()
-        val name  = tokenManager.getUserName()
-        val email = tokenManager.getUserEmail()
-        println("DEBUG nombre: $name")   // ← agregá esto
-        println("DEBUG email: $email")   // ← agregá esto
         uiState = uiState.copy(
-            userName  = name  ?: "Usuario",
-            userEmail = email ?: ""
+            userName  = tokenManager.getUserName()  ?: "Usuario",
+            userEmail = tokenManager.getUserEmail() ?: ""
         )
     }
 
@@ -153,14 +149,9 @@ class HomeViewModel @Inject constructor(
         reportFormState = reportFormState.copy(descriptionError = descriptionError, imageError = imageError)
         return descriptionError == null && imageError == null
     }
+
     fun logout() {
         tokenManager.clear()
-<<<<<<< Updated upstream
-        viewModelScope.launch {
-            _event.emit(UiEvent.NavigateLogin)
-        }
-=======
         viewModelScope.launch { _event.emit(UiEvent.NavigateLogin) }
->>>>>>> Stashed changes
     }
 }
