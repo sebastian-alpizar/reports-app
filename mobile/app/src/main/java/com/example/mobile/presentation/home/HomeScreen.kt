@@ -2,7 +2,9 @@ package com.example.mobile.presentation.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +18,7 @@ import com.example.mobile.presentation.components.ReportModal
 import com.example.mobile.presentation.utils.UiEvent
 import com.google.accompanist.permissions.*
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.navigation.NavController
 import com.example.mobile.presentation.components.snackbar.AppSnackbar
 import com.example.mobile.presentation.components.snackbar.SnackbarState
 import kotlinx.coroutines.launch
@@ -23,6 +26,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val snackbarState = remember { SnackbarState() }
@@ -43,6 +47,12 @@ fun HomeScreen(
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarState.show(event.message, event.isError)
+                }
+
+                UiEvent.NavigateLogin -> {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
                 else -> {}
             }
@@ -102,6 +112,19 @@ fun HomeScreen(
                                 Icons.Default.CameraAlt,
                                 contentDescription = "Reportar accidente",
                                 tint = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
+
+                        // FAB: logout
+                        FloatingActionButton(
+                            onClick = { viewModel.logout() },
+                            containerColor = Color(0xFFB00020).copy(alpha = 0.9f),
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Logout,
+                                contentDescription = "Cerrar sesión",
+                                tint = Color.White
                             )
                         }
                     }

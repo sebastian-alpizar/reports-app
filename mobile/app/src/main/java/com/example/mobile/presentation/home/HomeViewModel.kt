@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
+import com.example.mobile.core.util.TokenManager
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
 import com.example.mobile.domain.usecase.SendReportUseCase
@@ -15,9 +16,7 @@ import com.example.mobile.domain.usecase.location.GetLocationUpdatesUseCase
 import com.example.mobile.domain.usecase.location.HasLocationPermissionUseCase
 import com.example.mobile.presentation.utils.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
@@ -41,7 +40,8 @@ data class ReportFormState(
 class HomeViewModel @Inject constructor(
     private val getLocationUpdatesUseCase: GetLocationUpdatesUseCase,
     private val hasLocationPermissionUseCase: HasLocationPermissionUseCase,
-    private val sendReportUseCase: SendReportUseCase
+    private val sendReportUseCase: SendReportUseCase,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
     var uiState by mutableStateOf(HomeUiState())
@@ -213,5 +213,11 @@ class HomeViewModel @Inject constructor(
         )
 
         return descriptionError == null && imageError == null
+    }
+    fun logout() {
+        tokenManager.clear()
+        viewModelScope.launch {
+            _event.emit(UiEvent.NavigateLogin)
+        }
     }
 }

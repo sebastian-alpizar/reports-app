@@ -22,12 +22,16 @@ fun NavGraph() {
             LoginScreen(navController)
         }
 
+
         composable("register") {
             RegisterScreen(navController)
         }
-
         composable("home") {
-            HomeScreen()
+            HomeScreen(navController)
+        }
+
+        composable("admin") {
+          //  AdminScreen(navController) // ← pasa navController
         }
     }
 }

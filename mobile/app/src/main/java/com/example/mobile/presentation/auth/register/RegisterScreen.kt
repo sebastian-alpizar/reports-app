@@ -20,7 +20,6 @@ fun RegisterScreen(
 ) {
     val snackbarState = remember { SnackbarState() }
     val scope = rememberCoroutineScope()
-
     LaunchedEffect(true) {
         viewModel.event.collect { event ->
             when (event) {
@@ -32,10 +31,10 @@ fun RegisterScreen(
                         popUpTo("register") { inclusive = true }
                     }
                 }
+                UiEvent.NavigateLogin -> { } // ← agrega esto (no hace nada en register)
             }
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
         RegisterContent(
             viewModel = viewModel,
