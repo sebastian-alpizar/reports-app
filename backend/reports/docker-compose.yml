@@ -35,7 +35,7 @@ services:
       DB_USERNAME: reportsuser
       DB_PASSWORD: reportspass
 
-      JWT_SECRET:  mysupersecretjwtkeyparaReportApp2024
+      JWT_SECRET: mysupersecretjwtkey
 
       CLOUDINARY_CLOUD_NAME: dmz2knvds
       CLOUDINARY_API_KEY: 744686633472466
