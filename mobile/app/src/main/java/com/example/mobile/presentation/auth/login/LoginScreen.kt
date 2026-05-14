@@ -21,7 +21,6 @@ fun LoginScreen(
 
     LaunchedEffect(true) {
         viewModel.event.collect { event ->
-
             when (event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarState.show(event.message, event.isError)
@@ -30,8 +29,14 @@ fun LoginScreen(
                     navController.navigate("home") {
                         popUpTo("login") { inclusive = true }
                     }
-
                 }
+                UiEvent.NavigateLogin -> {  // ← agrega esto
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+
+                UiEvent.NavigateLogin -> { }
             }
         }
     }

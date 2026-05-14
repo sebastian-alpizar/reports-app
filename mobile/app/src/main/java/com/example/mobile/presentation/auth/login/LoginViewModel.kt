@@ -86,4 +86,11 @@ class LoginViewModel @Inject constructor(
         )
         return emailValidation == null && passwordValidation == null
     }
+
+    fun logout() {
+        tokenManager.clear()
+        viewModelScope.launch {
+            _event.emit(UiEvent.NavigateLogin)
+        }
+    }
 }
