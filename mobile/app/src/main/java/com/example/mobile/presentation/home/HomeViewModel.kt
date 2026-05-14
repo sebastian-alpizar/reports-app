@@ -43,7 +43,6 @@ data class ReportFormState(
     var description: String = "",
     var selectedImageUri: String? = null,
     val isSubmitting: Boolean = false,
-    // errores
     val descriptionError: String? = null,
     val imageError: String? = null
 )
@@ -163,7 +162,6 @@ class HomeViewModel @Inject constructor(
             }
             return
         }
-
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSendingReport = true)
 
