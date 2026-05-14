@@ -8,7 +8,9 @@ import com.example.mobile.presentation.admin.AdminScreen
 import com.example.mobile.presentation.auth.login.LoginScreen
 import com.example.mobile.presentation.auth.register.RegisterScreen
 import com.example.mobile.presentation.home.HomeScreen
-// import com.example.mobile.presentation.profile.ProfileScreen
+import com.example.mobile.presentation.profile.ProfileScreen
+
+import com.example.mobile.presentation.profile.ProfileScreen
 
 @Composable
 fun NavGraph() {
@@ -35,7 +37,7 @@ fun NavGraph() {
         }
 
         composable("profile") {
-          //  ProfileScreen(navController)
+           ProfileScreen(navController)
         }
 
         // TODO: agregar cuando esté lista
