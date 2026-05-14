@@ -12,32 +12,56 @@ import com.example.mobile.presentation.profile.ProfileScreen
 
 import com.example.mobile.presentation.profile.ProfileScreen
 
+private object Routes {
+    const val LOGIN    = "login"
+    const val REGISTER = "register"
+    const val HOME     = "home"
+}
+
 @Composable
-fun NavGraph() {
+fun NavGraph(startDestination: String = Routes.LOGIN) {
+
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
         startDestination = "login"
     ) {
-        composable("login") {
-            LoginScreen(navController)
+
+        composable(Routes.LOGIN) {
+            LoginScreen(
+                onLoginSuccess   = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Routes.REGISTER)
+                }
+            )
         }
 
-        composable("register") {
-            RegisterScreen(navController)
+        composable(Routes.REGISTER) {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.popBackStack()
+                }
+            )
         }
 
-        composable("home") {
-            HomeScreen(navController)
-        }
-
-        composable("admin") {
-            AdminScreen(navController)
-        }
-
-        composable("profile") {
-           ProfileScreen(navController)
+        composable(Routes.HOME) {
+            HomeScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // TODO: agregar cuando esté lista

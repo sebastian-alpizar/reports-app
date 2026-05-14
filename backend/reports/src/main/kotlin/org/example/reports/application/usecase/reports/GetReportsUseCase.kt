@@ -20,4 +20,16 @@ class GetReportsUseCase(
     fun getReportsByUser(userId: Long): List<Report> {
         return reportRepository.findByUserId(userId)
     }
+
+    /**
+     * Devuelve los reportes dentro del radio indicado (en km)
+     * alrededor de la coordenada dada. Default: 5 km.
+     */
+    fun getNearbyReports(
+        lat: Double,
+        lng: Double,
+        radiusKm: Double = 5.0
+    ): List<Report> {
+        return reportRepository.findNearby(lat, lng, radiusKm)
+    }
 }
