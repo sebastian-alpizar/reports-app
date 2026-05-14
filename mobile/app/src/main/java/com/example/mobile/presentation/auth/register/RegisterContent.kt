@@ -13,15 +13,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mobile.presentation.components.*
+import com.example.mobile.presentation.components.AppBackground
+import com.example.mobile.presentation.components.AppButton
+import com.example.mobile.presentation.components.AppPasswordField
+import com.example.mobile.presentation.components.AppTextField
 import com.example.mobile.presentation.utils.GlassModifiers
 
 @Composable
 fun RegisterContent(
     viewModel: RegisterViewModel,
-    navController: NavController
+//    navController: NavController
+    onNavigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier
+
 ) {
 
-    AppBackground {
+    AppBackground(modifier = modifier) {
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -43,7 +50,7 @@ fun RegisterContent(
 
             AppTextField(
                 value = viewModel.formState.name,
-                onValueChange = viewModel::updateName,
+                onValueChange = { viewModel.updateName(it)},
                 label = "Nombre",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.nameError != null
@@ -62,8 +69,10 @@ fun RegisterContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             AppTextField(
+//                value = viewModel.formState.email,
                 value = viewModel.formState.email,
-                onValueChange = viewModel::updateEmail,
+//                onValueChange = viewModel::updateEmail,
+                onValueChange = {viewModel.updateEmail(it)},
                 label = "Email",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.emailError != null
@@ -82,8 +91,10 @@ fun RegisterContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             AppTextField(
+//                value = viewModel.formState.nationalId,
                 value = viewModel.formState.nationalId,
-                onValueChange = viewModel::updateNationalId,
+//                onValueChange = viewModel::updateNationalId,
+                onValueChange = { viewModel.updateNationalId(it)},
                 label = "Cédula",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.nationalIdError != null
@@ -102,8 +113,10 @@ fun RegisterContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             AppPasswordField(
+//                value = viewModel.formState.password,
                 value = viewModel.formState.password,
-                onValueChange = viewModel::updatePassword,
+//                onValueChange = viewModel::updatePassword,
+                onValueChange = {viewModel.updatePassword(it)},
                 label = "Contraseña",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.passwordError != null
@@ -142,7 +155,8 @@ fun RegisterContent(
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF80D8FF),
                     modifier = Modifier.clickable {
-                        navController.navigate("login")
+//                        navController.navigate("login")
+                        onNavigateToLogin()
                     }
                 )
             }

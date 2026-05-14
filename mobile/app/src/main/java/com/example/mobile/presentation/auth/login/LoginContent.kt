@@ -13,15 +13,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.mobile.presentation.components.AppBackground
+import com.example.mobile.presentation.components.AppButton
+import com.example.mobile.presentation.components.AppPasswordField
+import com.example.mobile.presentation.components.AppTextField
 import com.example.mobile.presentation.components.*
 import com.example.mobile.presentation.utils.GlassModifiers
 
 @Composable
 fun LoginContent(
     viewModel: LoginViewModel,
-    navController: NavController
+//    navController: NavController
+    onNavigateToRegister: () -> Unit,
+    modifier: Modifier = Modifier
+
 ) {
-    AppBackground {
+    AppBackground(modifier = modifier) {
 
         Column(
             modifier = Modifier
@@ -62,8 +69,10 @@ fun LoginContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             AppTextField(
+//                value = viewModel.formState.email,
                 value = viewModel.formState.email,
-                onValueChange = viewModel::updateEmail,
+//                onValueChange = viewModel::updateEmail,
+                onValueChange = {viewModel.updateEmail(it)},
                 label = "Email",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.emailError != null
@@ -78,8 +87,10 @@ fun LoginContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             AppPasswordField(
+//                value = viewModel.formState.password,
                 value = viewModel.formState.password,
-                onValueChange = viewModel::updatePassword,
+//                onValueChange = viewModel::updatePassword,
+                onValueChange = {viewModel.updatePassword(it)},
                 label = "Contraseña",
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.formState.passwordError != null
@@ -110,11 +121,12 @@ fun LoginContent(
                 )
 
                 Text(
-                    "Regístrate",
+                    text = "Regístrate",
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF80D8FF),
                     modifier = Modifier.clickable {
-                        navController.navigate("register")
+//                        navController.navigate("register")
+                        onNavigateToRegister()
                     }
                 )
             }

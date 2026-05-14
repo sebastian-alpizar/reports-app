@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun AppBackground(
+    modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
