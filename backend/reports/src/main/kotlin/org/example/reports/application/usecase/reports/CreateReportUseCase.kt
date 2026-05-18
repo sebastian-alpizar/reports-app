@@ -24,7 +24,7 @@ class CreateReportUseCase(
     private val cloudinaryService: CloudinaryService
 ) {
     @Transactional(rollbackFor = [Exception::class])
-    fun execute(request: CreateReportRequest, photo: MultipartFile): Report {
+    fun execute(request: CreateReportRequest, photo: MultipartFile) {
         val email = authProvider.getCurrentUserEmail()
 
         val user = userRepository.findByEmail(email)
@@ -55,9 +55,5 @@ class CreateReportUseCase(
             report = savedReport
         )
         photoRepository.save(photo)
-
-        // Retornamos el reporte guardado con su ID real para que el móvil
-        // pueda mostrarlo en el mapa inmediatamente sin recargar.
-        return savedReport
     }
 }

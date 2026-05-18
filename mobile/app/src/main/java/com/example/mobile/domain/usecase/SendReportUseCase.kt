@@ -11,7 +11,7 @@ class SendReportUseCase @Inject constructor(
     suspend operator fun invoke(
         context: Context,
         report: Report
-    ): Result<Report> {
+    ): Result<Unit> {
         return repository.sendReport(context, report)
     }
 }

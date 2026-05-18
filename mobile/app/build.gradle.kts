@@ -67,7 +67,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -107,7 +106,4 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     // Accompanist permissions
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
-
-    implementation("org.maplibre.gl:android-sdk:9.7.2")
-    implementation("org.maplibre.gl:android-plugin-annotation-v9:2.0.2")
 }

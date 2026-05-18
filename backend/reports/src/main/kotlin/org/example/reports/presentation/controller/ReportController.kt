@@ -23,59 +23,23 @@ class ReportController(
     @PostMapping(consumes = ["multipart/form-data"])
     fun createReportWithPhoto(
         @RequestPart("report") reportData: CreateReportRequest,  // Los datos del reporte como JSON
-        @RequestPart("photo") photo: MultipartFile // El archivo de la foto
-    ): ResponseEntity<ReportResponse> {
+        @RequestPart("photo") photo: MultipartFile               // El archivo de la foto
+    ): ResponseEntity<ApiResponse<Unit>> {
         return try {
-            val savedReport = createReportUseCase.execute(reportData, photo)
+            val request = CreateReportRequest(
+                description = reportData.description,
+                latitude = reportData.latitude,
+                longitude = reportData.longitude,
+                approximateLocation = reportData.approximateLocation,
+                category = reportData.category,
+            )
+            createReportUseCase.execute(request, photo)
             ResponseEntity.status(HttpStatus.CREATED)
-                .body(mapper.toResponse(savedReport))
+                .body(ApiResponse(message = "Reporte creado exitosamente"))
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
+            ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse(message = "Error al crear el reporte: ${e.message}"))
         }
-    }
-
-//    ): ResponseEntity<ApiResponse<Unit>> {
-//        return try {
-//            val request = CreateReportRequest(
-//                description = reportData.description,
-//                latitude = reportData.latitude,
-//                longitude = reportData.longitude,
-//                approximateLocation = reportData.approximateLocation,
-//                category = reportData.category,
-//            )
-//            createReportUseCase.execute(request, photo)
-//            ResponseEntity.status(HttpStatus.CREATED)
-//                .body(ApiResponse(message = "Reporte creado exitosamente"))
-//        } catch (e: Exception) {
-//            ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                .body(ApiResponse(message = "Error al crear el reporte: ${e.message}"))
-//        }
-//    }
-
-    /**
-     * GET /api/reports/nearby?lat=9.93&lng=-84.08&radiusKm=5
-     * Devuelve los reportes dentro del radio indicado alrededor de la coordenada.
-     */
-    @GetMapping("/nearby")
-    fun getNearby(
-        @RequestParam lat: Double,
-        @RequestParam lng: Double,
-        @RequestParam(defaultValue = "5.0") radiusKm: Double
-    ): List<ReportResponse> {
-        return reportQueryService.getNearbyReports(lat, lng, radiusKm)
-            .map { mapper.toResponse(it) }
-    }
-
-    /**
-     * GET /api/reports/my
-     * Reportes del usuario autenticado (ya existía como /user/{userId},
-     * pero este endpoint no requiere pasar el ID en la URL).
-     */
-    @GetMapping("/my")
-    fun getMyReports(): List<ReportResponse> {
-        // Reutiliza getAll por ahora; si quieres filtrar por usuario autenticado
-        return reportQueryService.getAllReports()
-            .map { mapper.toResponse(it) }
     }
 
     @GetMapping

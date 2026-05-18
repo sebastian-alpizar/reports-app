@@ -1,37 +1,31 @@
 package com.example.mobile.data.remote.api
 
-import com.example.mobile.data.remote.dto.ReportRequest
+
 import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.data.remote.dto.UserDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ReportApi {
 
     @Multipart
     @POST("reports")
     suspend fun sendReport(
-        @Part("report") report: RequestBody,  // JSON como string
-        @Part photo: MultipartBody.Part       // Archivo de foto
-    ) : ReportResponse
+        @Part("report") report: RequestBody,
+        @Part photo: MultipartBody.Part
+    )
 
-    /**
-     * Obtiene reportes cercanos a una coordenada.
-     * El backend filtra por distancia en kilómetros.
-     */
+    @GET("reports")
+    suspend fun getAllReports(): List<ReportResponse>
 
-    @GET("reports/nearby")
-    suspend fun getNearbyReports(
-        @Query("lat") latitude: Double,
-        @Query("lng") longitude: Double,
-        @Query("radiusKm") radiusKm: Double = 5.0
-    ): List<ReportResponse>
+    @PATCH("reports/{id}/status")
+    suspend fun updateReportStatus(
+        @Path("id") id: Long,
+        @Body body: Map<String, String>
+    )
 
-    @GET("reports/my")
-    suspend fun getMyReports(): List<ReportResponse>
+
+    @GET("users/{id}")
+    suspend fun getUserById(@Path("id") id: Long): UserDto
 }

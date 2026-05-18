@@ -9,13 +9,12 @@ interface ReportRepository {
     suspend fun sendReport(
         context: Context,
         report: Report
-    ): Result<Report>
+    ): Result<Unit>
 
-    suspend fun getNearbyReports(
-        latitude: Double,
-        longitude: Double,
-        radiusKm: Double = 5.0
-    ): Result<List<Report>>
+    suspend fun getAllReports(): Result<List<ReportResponse>>  // ← agregá esto
 
-    suspend fun getMyReports(): Result<List<Report>>
+    suspend fun updateReportStatus(
+        id: Long,
+        status: ReportStatus
+    ): Result<Unit>  // ← agregá esto
 }

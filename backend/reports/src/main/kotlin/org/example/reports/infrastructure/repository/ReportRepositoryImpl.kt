@@ -27,11 +27,6 @@ class ReportRepositoryImpl(
             .map { mapper.toDomain(it) }
     }
 
-    override fun findNearby(lat: Double, lng: Double, radiusKm: Double): List<Report> {
-        return jpaRepository.findNearby(lat, lng, radiusKm)
-            .map { mapper.toDomain(it) }
-    }
-
     override fun save(report: Report): Report {
         val entity = mapper.toEntity(report)
         val saved = jpaRepository.save(entity)
