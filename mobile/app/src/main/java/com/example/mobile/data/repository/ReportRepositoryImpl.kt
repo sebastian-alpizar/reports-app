@@ -7,7 +7,6 @@ import com.example.mobile.data.remote.dto.ReportRequest
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
-import com.example.mobile.domain.model.ReportStatus
 import com.example.mobile.domain.repository.ReportRepository
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

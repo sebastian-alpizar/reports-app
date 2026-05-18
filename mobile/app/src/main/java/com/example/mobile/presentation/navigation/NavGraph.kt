@@ -4,13 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mobile.presentation.admin.AdminScreen
 import com.example.mobile.presentation.auth.login.LoginScreen
 import com.example.mobile.presentation.auth.register.RegisterScreen
 import com.example.mobile.presentation.home.HomeScreen
-import com.example.mobile.presentation.profile.ProfileScreen
-
-import com.example.mobile.presentation.profile.ProfileScreen
 
 private object Routes {
     const val LOGIN    = "login"
@@ -63,8 +59,5 @@ fun NavGraph(startDestination: String = Routes.LOGIN) {
                 }
             )
         }
-
-        // TODO: agregar cuando esté lista
-        // composable("history") { HistoryScreen(navController) }
     }
 }

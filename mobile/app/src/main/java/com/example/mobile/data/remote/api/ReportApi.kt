@@ -12,7 +12,6 @@ import retrofit2.http.Part
 import retrofit2.http.Query
 
 interface ReportApi {
-
     @Multipart
     @POST("reports")
     suspend fun sendReport(
