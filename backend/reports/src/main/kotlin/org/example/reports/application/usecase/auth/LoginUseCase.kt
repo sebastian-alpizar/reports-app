@@ -21,10 +21,6 @@ class LoginUseCase(
             throw RuntimeException("Credenciales inválidas")
         }
 
-        return jwtService.generateToken(
-            email = user.email,
-            id    = user.id,
-            name  = user.name
-        )
+        return jwtService.generateToken(user.email)
     }
 }

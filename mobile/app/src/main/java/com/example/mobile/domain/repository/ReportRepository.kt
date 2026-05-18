@@ -9,7 +9,15 @@ interface ReportRepository {
     suspend fun sendReport(
         context: Context,
         report: Report
-    ): Result<Unit>
+    ): Result<Report>
+
+    suspend fun getNearbyReports(
+        latitude: Double,
+        longitude: Double,
+        radiusKm: Double = 5.0
+    ): Result<List<Report>>
+
+    suspend fun getMyReports(): Result<List<Report>>
 
     suspend fun getAllReports(): Result<List<ReportResponse>>  // ← agregá esto
 
