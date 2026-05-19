@@ -13,7 +13,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import com.example.mobile.domain.model.ReportStatus
+import org.example.reports.domain.model.ReportStatus
 import retrofit2.HttpException
 import java.io.File
 import javax.inject.Inject

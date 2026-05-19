@@ -7,8 +7,10 @@ import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ReportApi {
@@ -33,4 +35,13 @@ interface ReportApi {
 
     @GET("reports/my")
     suspend fun getMyReports(): List<ReportResponse>
+
+    @GET("reports")
+    suspend fun getAllReports(): List<ReportResponse>
+
+    @PATCH("reports/{id}/status")
+    suspend fun updateReportStatus(
+        @Path("id") id: Long,
+        @Body body: Map<String, String>
+    )
 }
