@@ -34,11 +34,11 @@ import com.example.mobile.presentation.components.AppBackground
 // ── Paleta ──────────────────────────────────────────────────────────────────
 private val AccentPurple    = Color(0xFF7C3AED)
 private val AccentPurpleLight = Color(0xFF9F67FA)
-private val CardBg            = Color.White.copy(alpha = 0.25f)
+private val CardBg            = Color.White.copy(alpha = 0.5f)
 
 
-private val TextPrimary     = Color(0xFF1A0533)
-private val TextSecondary   = Color(0xFF1A0533).copy(alpha = 0.55f)
+//private val TextPrimary     = Color(0xFF1A0533)
+//private val TextSecondary   = Color(0xFF1A0533).copy(alpha = 0.55f)
 private val TagBg           = Color(0xFF7C3AED).copy(alpha = 0.25f)
 
 @Composable
@@ -76,7 +76,7 @@ fun ProfileScreen(
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = AccentPurpleLight,
+                                tint = Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -85,14 +85,14 @@ fun ProfileScreen(
                     Column {
                         Text(
                             "Mi Perfil",
-                            color = TextPrimary,
+                            color = Color.Black,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
                             letterSpacing = 0.2.sp
                         )
                         Text(
                             "Información de tu cuenta",
-                            color = TextSecondary,
+                            color = Color.Black,
                             fontSize = 11.sp,
                             letterSpacing = 0.3.sp
                         )
@@ -124,7 +124,7 @@ fun ProfileScreen(
                             Spacer(Modifier.height(14.dp))
                             Text(
                                 uiState.error,
-                                color = TextSecondary,
+                                color = Color.Black,
                                 fontSize = 14.sp
                             )
                         }
@@ -189,7 +189,7 @@ fun ProfileScreen(
 
                                 Text(
                                     user.name,
-                                    color = TextPrimary,
+                                    color = Color.Black,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 22.sp,
                                     letterSpacing = 0.2.sp
@@ -197,7 +197,7 @@ fun ProfileScreen(
                                 Spacer(Modifier.height(4.dp))
                                 Text(
                                     user.email,
-                                    color = TextSecondary,
+                                    color = Color.Black,
                                     fontSize = 13.sp,
                                     letterSpacing = 0.2.sp
                                 )
@@ -217,13 +217,13 @@ fun ProfileScreen(
                                         Icon(
                                             if (user.isAdmin) Icons.Default.AdminPanelSettings else Icons.Default.Person,
                                             null,
-                                            tint = AccentPurpleLight,
+                                            tint = Color.White,
                                             modifier = Modifier.size(15.dp)
                                         )
                                         Spacer(Modifier.width(7.dp))
                                         Text(
                                             if (user.isAdmin) "Administrador" else "Ciudadano",
-                                            color = AccentPurpleLight,
+                                            color = Color.Black,
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             letterSpacing = 0.3.sp
@@ -250,7 +250,7 @@ fun ProfileScreen(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 "INFORMACIÓN PERSONAL",
-                                color = TextSecondary,
+                                color = Color.Black,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 11.sp,
                                 letterSpacing = 1.8.sp
@@ -304,7 +304,7 @@ private fun ProfileInfoCard(icon: ImageVector, label: String, value: String) {
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = AccentPurpleLight,
+                    tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -315,7 +315,7 @@ private fun ProfileInfoCard(icon: ImageVector, label: String, value: String) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     label,
-                    color = TextSecondary,
+                    color = Color.Black,
                     fontSize = 11.sp,
                     letterSpacing = 0.4.sp,
                     fontWeight = FontWeight.Medium
@@ -323,7 +323,7 @@ private fun ProfileInfoCard(icon: ImageVector, label: String, value: String) {
                 Spacer(Modifier.height(4.dp))
                 Text(
                     value,
-                    color = TextPrimary,
+                    color = Color.Black,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 15.sp,
                     letterSpacing = 0.1.sp
@@ -334,7 +334,7 @@ private fun ProfileInfoCard(icon: ImageVector, label: String, value: String) {
             Icon(
                 Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = TextSecondary.copy(alpha = 0.4f),
+                tint = Color.Black.copy(alpha = 0.4f),
                 modifier = Modifier.size(18.dp)
             )
         }

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.mobile.presentation.components.AppDrawerContent
 import com.example.mobile.presentation.components.ReportMapView
 import com.example.mobile.presentation.components.ReportModal
 import com.example.mobile.presentation.components.snackbar.AppSnackbar
@@ -36,8 +37,8 @@ import kotlinx.coroutines.launch
 private val AccentPurple      = Color(0xFF7C3AED)
 private val AccentPurpleLight = Color(0xFF9F67FA)
 private val DangerRed         = Color(0xFFB71C1C)
-private val TextPrimary       = Color(0xFF1A0533)
-private val TextSecondary     = Color(0xFF1A0533).copy(alpha = 0.6f)
+// private val TextPrimary       = Color(0xFF1A0533)
+// private val TextSecondary     = Color(0xFF1A0533).copy(alpha = 0.6f)
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +85,7 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            AppDrawerContent(
+            AppDrawerContent (
                 userName  = uiState.userName,
                 userEmail = uiState.userEmail,
                 onHistorial = {
@@ -158,10 +159,10 @@ fun HomeScreen(
                                     modifier = Modifier
                                         .shadow(6.dp, CircleShape)
                                         .clip(CircleShape)
-                                        .background(Color.White.copy(alpha = 0.85f))
+                                        .background(Color.White.copy(alpha = 0.8f))
                                         .size(48.dp)
                                 ) {
-                                    Icon(Icons.Default.Menu, "Menú", tint = Color(0xFF7C3AED))
+                                    Icon(Icons.Default.Menu, "Menú", tint = AccentPurpleLight)
                                 }
                             }
 
@@ -191,7 +192,7 @@ fun HomeScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Text("Se necesita permiso de ubicación", color = TextPrimary)
+                                Text("Se necesita permiso de ubicación", color = Color.White)
                                 Spacer(Modifier.height(16.dp))
                                 Button(
                                     onClick = { locationPermissionState.launchPermissionRequest() },
@@ -205,176 +206,5 @@ fun HomeScreen(
                 }
             }
         }
-    }
-}
-
-// ── Drawer ────────────────────────────────────────────────────────────────────
-@Composable
-private fun AppDrawerContent(
-    userName: String,
-    userEmail: String,
-    onHistorial: () -> Unit,
-    onPerfil: () -> Unit,
-    onLogout: () -> Unit
-) {
-    ModalDrawerSheet(
-        modifier = Modifier.width(290.dp),
-        drawerContainerColor = Color.Transparent,
-        drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            Color(0xFFA78BFA),
-                            Color(0xFFC084FC),
-                            Color(0xFFF0ABFC)
-                        ),
-                        radius = 1200f
-                    )
-                )
-        ) {
-
-            // ── Header con avatar ─────────────────────────────────────────────
-            Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars).height(0.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                // Avatar
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .shadow(6.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(
-                                listOf(AccentPurpleLight, AccentPurple)
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = userName.firstOrNull()?.uppercaseChar()?.toString() ?: "U",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    )
-                }
-
-                Spacer(Modifier.width(14.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        userName,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        letterSpacing = 0.2.sp
-                    )
-                    Spacer(Modifier.height(3.dp))
-                    Text(
-                        userEmail,
-                        color = TextSecondary,
-                        fontSize = 12.sp,
-                        letterSpacing = 0.2.sp
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            // ── Label sección ─────────────────────────────────────────────────
-            Row(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(3.dp).height(12.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(AccentPurpleLight)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    "MENÚ",
-                    color = TextSecondary,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp
-                )
-            }
-
-            // ── Items de navegación ───────────────────────────────────────────
-            DrawerItem(
-                icon  = Icons.Default.History,
-                label = "Historial",
-                onClick = onHistorial
-            )
-            DrawerItem(
-                icon  = Icons.Default.Person,
-                label = "Mi Perfil",
-                onClick = onPerfil
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            // ── Logout ────────────────────────────────────────────────────────
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                color = Color(0xFF1A0533).copy(alpha = 0.15f)
-            )
-            Spacer(Modifier.height(4.dp))
-            DrawerItem(
-                icon       = Icons.AutoMirrored.Filled.Logout,
-                label      = "Cerrar sesión",
-                iconTint   = DangerRed,
-                labelColor = DangerRed,
-                onClick    = onLogout
-            )
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-private fun DrawerItem(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit,
-    iconTint: Color = TextPrimary,
-    labelColor: Color = TextPrimary
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 2.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(iconTint.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, null, tint = iconTint, modifier = Modifier.size(18.dp))
-        }
-        Spacer(Modifier.width(14.dp))
-        Text(
-            label,
-            color = labelColor,
-            fontWeight = FontWeight.Medium,
-            fontSize = 15.sp,
-            letterSpacing = 0.2.sp
-        )
     }
 }
