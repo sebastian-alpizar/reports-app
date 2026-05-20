@@ -1,4 +1,5 @@
 package com.example.mobile.presentation.history
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,25 +28,59 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.presentation.components.AppBackground
 
-private val AccentPurple = Color(0xFF7C3AED)
+// ── COLORES ───────────────────────────────────────────────────────────────────
+private val AccentPurple      = Color(0xFF7C3AED)
 private val AccentPurpleLight = Color(0xFF9F67FA)
-private val CardBg = Color.White.copy(alpha = 0.5f)
+private val CardBg            = Color.White.copy(alpha = 0.5f)
 
+// ── ENUM DE ESTADOS (igual que AdminScreen) ───────────────────────────────────
+private enum class ReportStatus(
+    val apiValue : String,
+    val label    : String,
+    val dot      : Color,
+    val bgColor  : Color,
+    val textColor: Color
+) {
+    PENDING(
+        apiValue  = "PENDING",
+        label     = "Pendiente",
+        dot       = Color(0xFFAB8BF5),
+        bgColor   = Color(0xFFAB8BF5),
+        textColor = Color(0xFF5B21B6)
+    ),
+    REJECTED(
+        apiValue  = "REJECTED",
+        label     = "En proceso",
+        dot       = Color(0xFF7C3AED),
+        bgColor   = Color(0xFF7C3AED),
+        textColor = Color(0xFF3B0764)
+    ),
+    APPROVED(
+        apiValue  = "APPROVED",
+        label     = "Resuelto",
+        dot       = Color(0xFF4C1D95),
+        bgColor   = Color(0xFF4C1D95),
+        textColor = Color(0xFFEDE9FE)
+    );
+
+    companion object {
+        fun from(value: String?): ReportStatus =
+            entries.firstOrNull { it.apiValue.equals(value, ignoreCase = true) } ?: PENDING
+    }
+}
+
+// ── PANTALLA ──────────────────────────────────────────────────────────────────
 @Composable
 fun HistoryScreen(
     navController: NavController,
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AppBackground {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-
-            // ── TOP BAR ──────────────────────────────────────────────
+            // ── TOP BAR ──────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -55,18 +90,11 @@ fun HistoryScreen(
                     .background(CardBg)
                     .padding(horizontal = 8.dp, vertical = 6.dp)
             ) {
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier          = Modifier.fillMaxWidth()
                 ) {
-
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
-
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
@@ -74,11 +102,10 @@ fun HistoryScreen(
                                 .background(AccentPurple.copy(alpha = 0.2f)),
                             contentAlignment = Alignment.Center
                         ) {
-
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = Color.White,
+                                tint     = Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -87,17 +114,15 @@ fun HistoryScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Column {
-
                         Text(
-                            text = "Mis Reportes",
-                            color = Color.Black,
+                            text       = "Mis Reportes",
+                            color      = Color.Black,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
+                            fontSize   = 18.sp
                         )
-
                         Text(
-                            text = "Historial de reportes realizados",
-                            color = Color.Black,
+                            text     = "Historial de reportes realizados",
+                            color    = Color.Black,
                             fontSize = 11.sp
                         )
                     }
@@ -105,46 +130,27 @@ fun HistoryScreen(
             }
 
             when {
-
                 uiState.isLoading -> {
-
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        CircularProgressIndicator(
-                            color = AccentPurple
-                        )
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = AccentPurple)
                     }
                 }
 
                 uiState.error != null -> {
-
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Text(
-                            text = uiState.error ?: "",
-                            color = Color.Black
-                        )
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = uiState.error ?: "", color = Color.Black)
                     }
                 }
 
                 else -> {
-
                     LazyColumn(
-                        modifier = Modifier
+                        modifier            = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 10.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 24.dp)
+                        contentPadding      = PaddingValues(bottom = 24.dp)
                     ) {
-
                         items(uiState.reports) { report ->
-
                             ReportCard(report)
                         }
                     }
@@ -154,11 +160,9 @@ fun HistoryScreen(
     }
 }
 
+// ── CARD ──────────────────────────────────────────────────────────────────────
 @Composable
-private fun ReportCard(
-    report: ReportResponse
-) {
-
+private fun ReportCard(report: ReportResponse) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -166,28 +170,17 @@ private fun ReportCard(
             .background(CardBg)
             .padding(16.dp)
     ) {
-
         Column {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(RoundedCornerShape(14.dp))
                         .background(
-                            Brush.linearGradient(
-                                listOf(
-                                    AccentPurpleLight,
-                                    AccentPurple
-                                )
-                            )
+                            Brush.linearGradient(listOf(AccentPurpleLight, AccentPurple))
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
@@ -198,14 +191,11 @@ private fun ReportCard(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column {
-
-
                     Spacer(modifier = Modifier.height(4.dp))
-
                     Text(
-                        text = report.description,
-                        color = Color.Black.copy(alpha = 0.7f),
-                        fontSize = 12.sp,
+                        text       = report.description,
+                        color      = Color.Black.copy(alpha = 0.7f),
+                        fontSize   = 12.sp,
                         lineHeight = 18.sp
                     )
                 }
@@ -213,22 +203,20 @@ private fun ReportCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Divider(
-                color = Color.Black.copy(alpha = 0.08f)
-            )
+            HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier              = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment     = Alignment.CenterVertically
             ) {
-
-                StatusChip(report.status ?: "PENDING")
+                StatusChip(report.status)
 
                 Text(
-                    text = report.reportDate,
-                    color = Color.Black.copy(alpha = 0.55f),
+                    text     = report.reportDate,
+                    color    = Color.Black.copy(alpha = 0.55f),
                     fontSize = 11.sp
                 )
             }
@@ -236,29 +224,31 @@ private fun ReportCard(
     }
 }
 
+// ── CHIP DE ESTADO ────────────────────────────────────────────────────────────
 @Composable
-private fun StatusChip(
-    status: String
-) {
-
-    val color = when (status.lowercase()) {
-        "pendiente" -> Color(0xFFFF9800)
-        "resuelto" -> Color(0xFF4CAF50)
-        else -> AccentPurple
-    }
+private fun StatusChip(status: String?) {
+    val s = ReportStatus.from(status)
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50.dp))
-            .background(color.copy(alpha = 0.18f))
-            .padding(horizontal = 14.dp, vertical = 6.dp)
+            .background(s.bgColor.copy(alpha = 0.16f))
+            .padding(horizontal = 12.dp, vertical = 5.dp)
     ) {
-
-        Text(
-            text = status,
-            color = color,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 11.sp
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(s.dot)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text       = s.label,
+                color      = s.textColor,
+                fontWeight = FontWeight.SemiBold,
+                fontSize   = 11.sp
+            )
+        }
     }
 }
