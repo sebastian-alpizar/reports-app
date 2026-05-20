@@ -1,5 +1,8 @@
 package com.example.mobile.presentation.admin
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.presentation.components.AppBackground
 import kotlinx.coroutines.launch
@@ -60,7 +65,6 @@ fun AdminScreen(
                                 .height(0.dp)
                         )
 
-                        // ── HEADER ───────────────────────────────────
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -106,15 +110,12 @@ fun AdminScreen(
 
                         Spacer(Modifier.height(8.dp))
 
-                        // ── ITEM: REPORTES ───────────────────────────
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 2.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .clickable {
-                                    scope.launch { drawerState.close() }
-                                }
+                                .clickable { scope.launch { drawerState.close() } }
                                 .padding(horizontal = 12.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -154,7 +155,6 @@ fun AdminScreen(
 
                         Spacer(Modifier.height(4.dp))
 
-                        // ── ITEM: CERRAR SESIÓN ──────────────────────
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -202,7 +202,6 @@ fun AdminScreen(
             }
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-
                 Column(modifier = Modifier.fillMaxSize()) {
 
                     // ── TOP BAR ──────────────────────────────────
@@ -332,21 +331,29 @@ fun AdminReportCard(
     onStatusChange: (String) -> Unit,
     onDelete: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var dropdownExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var detailExpanded by remember { mutableStateOf(false) }
 
     val statusColor = when (report.status?.uppercase()) {
-        "PENDIENTE"   -> Color(0xFFF59E0B)
-        "IN_PROGRESS" -> Color(0xFF3B82F6)
-        "RESOLVED"    -> Color(0xFF10B981)
+        "PENDING"     -> Color(0xFFF59E0B)
+        "REJECTED"    -> Color(0xFF3B82F6)
+        "APPROVED"    -> Color(0xFF10B981)
         else          -> AccentPurple
     }
 
     val statusTextColor = when (report.status?.uppercase()) {
-        "PENDIENTE"   -> Color(0xFF92400E)
-        "IN_PROGRESS" -> Color(0xFF1E3A5F)
-        "RESOLVED"    -> Color(0xFF064E3B)
+        "PENDING"     -> Color(0xFF92400E)
+        "REJECTED"    -> Color(0xFF1E3A5F)
+        "APPROVED"    -> Color(0xFF064E3B)
         else          -> Color(0xFF3C3489)
+    }
+
+    val statusLabel = when (report.status?.uppercase()) {
+        "PENDING"     -> "Pendiente"
+        "REJECTED"    -> "En proceso"
+        "APPROVED"    -> "Resuelto"
+        else          -> report.status ?: "Sin estado"
     }
 
     Box(
@@ -377,13 +384,23 @@ fun AdminReportCard(
 
                 Spacer(Modifier.width(12.dp))
 
-                Text(
-                    text = report.description,
-                    fontSize = 13.sp,
-                    color = Color.Black.copy(alpha = 0.72f),
-                    lineHeight = 19.sp,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = report.description,
+                        fontSize = 13.sp,
+                        color = Color.Black.copy(alpha = 0.72f),
+                        lineHeight = 19.sp
+                    )
+                    report.userName?.let {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = it,
+                            fontSize = 11.sp,
+                            color = AccentPurple.copy(alpha = 0.8f),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.height(13.dp))
@@ -400,7 +417,7 @@ fun AdminReportCard(
             ) {
                 Box {
                     Surface(
-                        onClick = { expanded = true },
+                        onClick = { dropdownExpanded = true },
                         shape = RoundedCornerShape(50.dp),
                         color = statusColor.copy(alpha = 0.14f)
                     ) {
@@ -409,12 +426,7 @@ fun AdminReportCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = when (report.status?.uppercase()) {
-                                    "PENDIENTE"   -> "Pendiente"
-                                    "IN_PROGRESS" -> "En proceso"
-                                    "RESOLVED"    -> "Resuelto"
-                                    else          -> report.status ?: "Sin estado"
-                                },
+                                text = statusLabel,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = statusTextColor
@@ -430,8 +442,8 @@ fun AdminReportCard(
                     }
 
                     DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false }
                     ) {
                         listOf("PENDIENTE", "IN_PROGRESS", "RESOLVED").forEach { status ->
                             DropdownMenuItem(
@@ -446,7 +458,7 @@ fun AdminReportCard(
                                     )
                                 },
                                 onClick = {
-                                    expanded = false
+                                    dropdownExpanded = false
                                     onStatusChange(status)
                                 }
                             )
@@ -468,8 +480,33 @@ fun AdminReportCard(
                         color = Color.Black.copy(alpha = 0.42f)
                     )
 
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(8.dp))
 
+                    // ── BOTÓN EXPANDIR ────────────────────
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(AccentPurple.copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(
+                            onClick = { detailExpanded = !detailExpanded },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                if (detailExpanded) Icons.Default.KeyboardArrowUp
+                                else Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Ver detalle",
+                                tint = AccentPurple,
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.width(6.dp))
+
+                    // ── BOTÓN ELIMINAR ────────────────────
                     Box(
                         modifier = Modifier
                             .size(28.dp)
@@ -489,6 +526,85 @@ fun AdminReportCard(
                             )
                         }
                     }
+                }
+            }
+
+            // ── DETALLE EXPANDIBLE ────────────────────────
+            AnimatedVisibility(
+                visible = detailExpanded,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column {
+                    Spacer(Modifier.height(12.dp))
+                    HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
+                    Spacer(Modifier.height(12.dp))
+
+                    // Foto
+                    report.photoUrl?.let { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = "Foto del reporte",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+
+                    // Usuario
+                    report.userName?.let {
+                        DetailRow(
+                            icon = Icons.Default.Person,
+                            label = "Usuario",
+                            value = it
+                        )
+                    }
+
+                    // Email
+                    report.userEmail?.let {
+                        DetailRow(
+                            icon = Icons.Default.Email,
+                            label = "Correo",
+                            value = it
+                        )
+                    }
+
+                    // Ubicación aproximada
+                    report.approximateLocation?.let {
+                        DetailRow(
+                            icon = Icons.Default.LocationOn,
+                            label = "Ubicación",
+                            value = it
+                        )
+                    }
+
+                    // Coordenadas
+                    if (report.latitude != null && report.longitude != null) {
+                        DetailRow(
+                            icon = Icons.Default.MyLocation,
+                            label = "Coordenadas",
+                            value = "${report.latitude}, ${report.longitude}"
+                        )
+                    }
+
+                    // Categoría
+                    report.category?.let {
+                        DetailRow(
+                            icon = Icons.Default.Category,
+                            label = "Categoría",
+                            value = it
+                        )
+                    }
+
+                    // ID
+                    DetailRow(
+                        icon = Icons.Default.Tag,
+                        label = "ID",
+                        value = "#${report.id}"
+                    )
                 }
             }
 
@@ -541,6 +657,40 @@ fun AdminReportCard(
                     Text("Cancelar", fontSize = 13.sp)
                 }
             }
+        )
+    }
+}
+
+@Composable
+private fun DetailRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = AccentPurple.copy(alpha = 0.7f),
+            modifier = Modifier.size(15.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            color = Color.Black.copy(alpha = 0.45f),
+            modifier = Modifier.width(80.dp)
+        )
+        Text(
+            text = value,
+            fontSize = 12.sp,
+            color = Color.Black.copy(alpha = 0.75f),
+            fontWeight = FontWeight.Medium
         )
     }
 }
