@@ -9,5 +9,8 @@ import org.mapstruct.Mapping
 interface ReportDtoMapper {
 
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.name", target = "userName")
+    @Mapping(source = "user.email", target = "userEmail")
+    @Mapping(source = "photoUrl", target = "photoUrl")
     fun toResponse(report: Report): ReportResponse
 }

@@ -1,18 +1,21 @@
 package com.example.mobile.presentation.admin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,237 +23,515 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mobile.data.remote.dto.ReportResponse
-import com.example.mobile.domain.model.ReportStatus
-import com.example.mobile.presentation.components.snackbar.AppSnackbar
-import com.example.mobile.presentation.components.snackbar.SnackbarState
-import com.example.mobile.presentation.utils.UiEvent
+import com.example.mobile.presentation.components.AppBackground
 import kotlinx.coroutines.launch
 
-private val AdminPrimary    = Color(0xFF1A1A2E)
-private val AdminAccent     = Color(0xFF6750A4)
-private val CardBg          = Color(0xFF16213E)
-private val PendingColor    = Color(0xFFFFA726)
-private val InProgressColor = Color(0xFF42A5F5)
-private val ResolvedColor   = Color(0xFF66BB6A)
+private val AccentPurple = Color(0xFF7C3AED)
+private val AccentPurpleLight = Color(0xFF9F67FA)
+private val CardBg = Color.White.copy(alpha = 0.52f)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminScreen(
     navController: NavController,
     viewModel: AdminViewModel = hiltViewModel()
 ) {
-    val uiState = viewModel.uiState
-    val snackbarState = remember { SnackbarState() }
+    val uiState by viewModel.uiState.collectAsState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        viewModel.event.collect { event ->
-            when (event) {
-                is UiEvent.ShowSnackbar -> snackbarState.show(event.message, event.isError)
-                UiEvent.NavigateLogin -> {
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
+    AppBackground {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet(
+                    modifier = Modifier.width(290.dp),
+                    drawerContainerColor = Color.Transparent,
+                    drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White.copy(alpha = 0.7f))
+                    ) {
+                        Spacer(
+                            Modifier
+                                .windowInsetsPadding(WindowInsets.statusBars)
+                                .height(0.dp)
+                        )
+
+                        // ── HEADER ───────────────────────────────────
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        Brush.linearGradient(
+                                            listOf(AccentPurpleLight, AccentPurple)
+                                        )
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "A",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp
+                                )
+                            }
+
+                            Spacer(Modifier.width(14.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    "Administrador",
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(Modifier.height(3.dp))
+                                Text(
+                                    "admin@system.com",
+                                    color = Color.Black,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(8.dp))
+
+                        // ── ITEM: REPORTES ───────────────────────────
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 2.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable {
+                                    scope.launch { drawerState.close() }
+                                }
+                                .padding(horizontal = 12.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(AccentPurpleLight, AccentPurple)
+                                        )
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Description,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(14.dp))
+                            Text(
+                                "Reportes",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 15.sp
+                            )
+                        }
+
+                        Spacer(Modifier.weight(1f))
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            color = Color.White
+                        )
+
+                        Spacer(Modifier.height(4.dp))
+
+                        // ── ITEM: CERRAR SESIÓN ──────────────────────
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 2.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable {
+                                    scope.launch { drawerState.close() }
+                                    navController.navigate("login") {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }
+                                .padding(horizontal = 12.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(Color(0xFFD32F2F), Color(0xFFEF5350))
+                                        )
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.Logout,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(14.dp))
+                            Text(
+                                "Cerrar sesión",
+                                color = Color(0xFFB71C1C),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 15.sp
+                            )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
                     }
                 }
-                else -> {}
+            }
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+
+                Column(modifier = Modifier.fillMaxSize()) {
+
+                    // ── TOP BAR ──────────────────────────────────
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                            .padding(horizontal = 14.dp, vertical = 14.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(CardBg)
+                            .padding(horizontal = 12.dp, vertical = 10.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(AccentPurple),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                IconButton(
+                                    onClick = { scope.launch { drawerState.open() } },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Menu,
+                                        contentDescription = "Menú",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(Modifier.width(10.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Panel de Administración",
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1E1B4B)
+                                )
+                                Text(
+                                    text = "${uiState.reports.size} reportes",
+                                    fontSize = 11.sp,
+                                    color = Color.Black.copy(alpha = 0.45f)
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(AccentPurple.copy(alpha = 0.1f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                IconButton(
+                                    onClick = { viewModel.loadAllReports() },
+                                    modifier = Modifier.size(34.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = "Actualizar",
+                                        tint = AccentPurple,
+                                        modifier = Modifier.size(17.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    when {
+                        uiState.isLoading -> {
+                            Box(
+                                Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = AccentPurpleLight)
+                            }
+                        }
+
+                        uiState.error != null -> {
+                            Box(
+                                Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(uiState.error ?: "", color = Color.Black)
+                            }
+                        }
+
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 14.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                contentPadding = PaddingValues(bottom = 24.dp)
+                            ) {
+                                items(uiState.reports) { report ->
+                                    AdminReportCard(
+                                        report = report,
+                                        isLoading = uiState.updatingId == report.id,
+                                        onStatusChange = { status ->
+                                            viewModel.updateStatus(report.id, status)
+                                        },
+                                        onDelete = {
+                                            // viewModel.deleteReport(report.id)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
+}
 
-    Box(modifier = Modifier.fillMaxSize().background(AdminPrimary)) {
-        Column(modifier = Modifier.fillMaxSize()) {
+@Composable
+fun AdminReportCard(
+    report: ReportResponse,
+    isLoading: Boolean,
+    onStatusChange: (String) -> Unit,
+    onDelete: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
-            // Top Bar
-            Row(
-                modifier = Modifier.fillMaxWidth().background(CardBg).padding(horizontal = 20.dp, vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Default.AdminPanelSettings, null, tint = AdminAccent, modifier = Modifier.size(28.dp))
-                Spacer(Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Panel Municipal", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text("Gestión de reportes ciudadanos", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-                }
-            }
+    val statusColor = when (report.status?.lowercase()) {
+        "pendiente"  -> Color(0xFFF59E0B)
+        "en_proceso" -> Color(0xFF3B82F6)
+        "resuelto"   -> Color(0xFF10B981)
+        else         -> AccentPurple
+    }
 
-            val reports = uiState.reports ?: emptyList()
+    val statusTextColor = when (report.status?.lowercase()) {
+        "pendiente"  -> Color(0xFF92400E)
+        "en_proceso" -> Color(0xFF1E3A5F)
+        "resuelto"   -> Color(0xFF064E3B)
+        else         -> Color(0xFF3C3489)
+    }
 
-            val pending = reports.count { it.status == "PENDING" }
-            val inProgress = reports.count { it.status == "IN_PROGRESS" }
-            val resolved = reports.count { it.status == "RESOLVED" }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(CardBg)
+            .padding(16.dp)
+    ) {
+        Column {
 
-            Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatChip("Pendientes", pending,    PendingColor,    Modifier.weight(1f))
-                StatChip("En proceso", inProgress, InProgressColor, Modifier.weight(1f))
-                StatChip("Resueltos",  resolved,   ResolvedColor,   Modifier.weight(1f))
-            }
-
-            // Search
-            OutlinedTextField(
-                value = uiState.searchQuery,
-                onValueChange = viewModel::onSearchQueryChange,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                placeholder = { Text("Buscar por descripción o zona...", color = Color.White.copy(alpha = 0.4f)) },
-                leadingIcon = { Icon(Icons.Default.Search, null, tint = AdminAccent) },
-                trailingIcon = {
-                    if (uiState.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.onSearchQueryChange("") }) {
-                            Icon(Icons.Default.Close, null, tint = Color.White.copy(alpha = 0.6f))
-                        }
-                    }
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = AdminAccent, unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                    focusedTextColor = Color.White, unfocusedTextColor = Color.White, cursorColor = AdminAccent
-                ),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true
-            )
-
-            // Filter chips
-            val filters = listOf(
-                null to "Todos",
-                ReportStatus.PENDING     to "Pendientes",
-                ReportStatus.IN_PROGRESS to "En proceso",
-                ReportStatus.RESOLVED    to "Resueltos"
-            )
-            LazyRow(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(filters) { (status, label) ->
-                    val selected = uiState.selectedStatus == status
-                    FilterChip(
-                        selected = selected,
-                        onClick = { viewModel.filterByStatus(status) },
-                        label = { Text(label, fontSize = 13.sp) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = AdminAccent, selectedLabelColor = Color.White,
-                            containerColor = CardBg, labelColor = Color.White.copy(alpha = 0.7f)
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true, selected = selected,
-                            selectedBorderColor = AdminAccent, borderColor = Color.White.copy(alpha = 0.2f)
-                        )
+            // ── ICON + DESCRIPTION ───────────────────────
+            Row(verticalAlignment = Alignment.Top) {
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(AccentPurple),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Description,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
+
+                Spacer(Modifier.width(12.dp))
+
+                Text(
+                    text = report.description,
+                    fontSize = 13.sp,
+                    color = Color.Black.copy(alpha = 0.72f),
+                    lineHeight = 19.sp,
+                    modifier = Modifier.weight(1f)
+                )
             }
 
-            // List
-            Box(modifier = Modifier.weight(1f)) {
-                when {
-                    uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = AdminAccent)
-                    uiState.error != null -> Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+            Spacer(Modifier.height(13.dp))
+
+            HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
+
+            Spacer(Modifier.height(11.dp))
+
+            // ── FOOTER: STATUS + DATE + DELETE ───────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box {
+                    Surface(
+                        onClick = { expanded = true },
+                        shape = RoundedCornerShape(50.dp),
+                        color = statusColor.copy(alpha = 0.14f)
                     ) {
-                        Icon(Icons.Default.ErrorOutline, null, tint = Color(0xFFEF5350), modifier = Modifier.size(64.dp))
-                        Spacer(Modifier.height(16.dp))
-                        Text(uiState.error, color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
-                        Spacer(Modifier.height(16.dp))
-                        Button(onClick = viewModel::loadReports, colors = ButtonDefaults.buttonColors(containerColor = AdminAccent)) { Text("Reintentar") }
-                    }
-                    uiState.filteredReports.isEmpty() -> Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(Icons.Default.Inbox, null, tint = Color.White.copy(alpha = 0.3f), modifier = Modifier.size(64.dp))
-                        Spacer(Modifier.height(16.dp))
-                        Text("No hay reportes", color = Color.White.copy(alpha = 0.5f), fontSize = 16.sp)
-                    }
-                    else -> LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(uiState.filteredReports, key = { it.id }) { report ->
-                            ReportAdminCard(report = report, onStatusChange = { viewModel.updateStatus(report.id, it) })
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = report.status ?: "Sin estado",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = statusTextColor
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Icon(
+                                Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = statusTextColor,
+                                modifier = Modifier.size(13.dp)
+                            )
                         }
-                        item { Spacer(Modifier.height(80.dp)) }
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        listOf("pendiente", "en_proceso", "resuelto").forEach { status ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = status.replaceFirstChar { it.uppercase() }
+                                            .replace("_", " ")
+                                    )
+                                },
+                                onClick = {
+                                    expanded = false
+                                    onStatusChange(status)
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.CalendarToday,
+                        contentDescription = null,
+                        tint = Color.Black.copy(alpha = 0.4f),
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        text = report.reportDate,
+                        fontSize = 11.sp,
+                        color = Color.Black.copy(alpha = 0.42f)
+                    )
+
+                    Spacer(Modifier.width(10.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFEF4444).copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(
+                            onClick = { showDialog = true },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Eliminar",
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        AppSnackbar(
-            message = snackbarState.message, isError = snackbarState.isError,
-            visible = snackbarState.isVisible, onDismiss = { scope.launch { snackbarState.dismiss() } },
-           // modifier = Modifier.align(Alignment.BottomCenter)
+            if (isLoading) {
+                Spacer(Modifier.height(8.dp))
+                CircularProgressIndicator(
+                    color = AccentPurpleLight,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            shape = RoundedCornerShape(20.dp),
+            title = {
+                Text(
+                    "Eliminar reporte",
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E1B4B)
+                )
+            },
+            text = {
+                Text(
+                    "¿Seguro que querés eliminar este reporte? Esta acción no se puede deshacer.",
+                    fontSize = 13.sp,
+                    color = Color.Black.copy(alpha = 0.6f)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        onDelete()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Eliminar", color = Color.White, fontSize = 13.sp)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showDialog = false },
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Cancelar", fontSize = 13.sp)
+                }
+            }
         )
-    }
-}
-
-@Composable
-private fun StatChip(label: String, count: Int, color: Color, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.clip(RoundedCornerShape(12.dp)).background(color.copy(alpha = 0.15f)).padding(vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("$count", color = color, fontWeight = FontWeight.Bold, fontSize = 22.sp)
-        Text(label, color = color.copy(alpha = 0.8f), fontSize = 11.sp)
-    }
-}
-
-@Composable
-private fun ReportAdminCard(report: ReportResponse, onStatusChange: (ReportStatus) -> Unit) {
-    val statusColor = when (report.status) {
-        "PENDING"     -> PendingColor
-        "IN_PROGRESS" -> InProgressColor
-        else          -> ResolvedColor
-    }
-    val statusLabel = when (report.status) {
-        "PENDING"     -> "Pendiente"
-        "IN_PROGRESS" -> "En proceso"
-        else          -> "Resuelto"
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CardBg),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(report.category, color = AdminAccent, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    Text(report.description, color = Color.White, fontWeight = FontWeight.Medium, fontSize = 15.sp, maxLines = 2)
-                }
-                Spacer(Modifier.width(8.dp))
-                Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(statusColor.copy(alpha = 0.2f)).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                    Text(statusLabel, color = statusColor, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.LocationOn, null, tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(14.dp))
-                Spacer(Modifier.width(4.dp))
-                Text(report.approximateLocation, color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
-            }
-
-            Spacer(Modifier.height(12.dp))
-            HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
-            Spacer(Modifier.height(12.dp))
-
-            Text("Cambiar estado:", color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
-            Spacer(Modifier.height(8.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (report.status != "PENDING")     StatusButton("Pendiente",  PendingColor)    { onStatusChange(ReportStatus.PENDING) }
-                if (report.status != "IN_PROGRESS") StatusButton("En proceso", InProgressColor) { onStatusChange(ReportStatus.IN_PROGRESS) }
-                if (report.status != "RESOLVED")    StatusButton("Resuelto",   ResolvedColor)   { onStatusChange(ReportStatus.RESOLVED) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatusButton(label: String, color: Color, onClick: () -> Unit) {
-    OutlinedButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = color),
-        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.5f)),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Text(label, fontSize = 12.sp)
     }
 }

@@ -43,6 +43,7 @@ class CreateReportUseCase(
             approximateLocation = request.approximateLocation,
             reportDate = LocalDateTime.now(),
             category = request.category,
+            photoUrl = null,
             status = ReportStatus.PENDING,
             user = user
         )

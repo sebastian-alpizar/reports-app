@@ -224,7 +224,7 @@ private fun ReportCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                StatusChip(report.status)
+                //StatusChip(report.status)
 
                 Text(
                     text = report.reportDate,

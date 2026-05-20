@@ -3,11 +3,9 @@ package com.example.mobile.data.remote.dto
 data class ReportResponse(
     val id: Long,
     val description: String,
-    val latitude: Double,
-    val longitude: Double,
-    val approximateLocation: String,
-    val category: String,
-    val status: String,
+    val approximateLocation: String?,
     val reportDate: String,
-    val userId: Long
+    val status: String?,
+    val userName: String?,
+    val userEmail: String?
 )

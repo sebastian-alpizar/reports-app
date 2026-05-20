@@ -1,6 +1,7 @@
 package org.example.reports.infrastructure.repository
 
 import org.example.reports.domain.model.Report
+import org.example.reports.domain.model.ReportStatus
 import org.example.reports.domain.repository.ReportRepository
 import org.example.reports.infrastructure.mapper.ReportMapper
 import org.springframework.stereotype.Repository
@@ -36,4 +37,20 @@ class ReportRepositoryImpl(
     override fun deleteById(id: Long) {
         jpaRepository.deleteById(id)
     }
+
+    override fun updateStatus(
+        reportId: Long,
+        status: ReportStatus
+    ) {
+
+        val report = findById(reportId)
+            ?: throw Exception("Reporte no encontrado")
+
+        val updatedReport = report.copy(
+            status = status
+        )
+
+        save(updatedReport)
+    }
+
 }

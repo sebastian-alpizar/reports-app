@@ -3,9 +3,11 @@ package org.example.reports.presentation.controller
 import org.example.reports.application.usecase.reports.CreateReportUseCase
 import org.example.reports.application.usecase.reports.DeleteReportUseCase
 import org.example.reports.application.usecase.reports.GetReportsUseCase
+import org.example.reports.application.usecase.reports.UpdateReportStatusUseCase
 import org.example.reports.presentation.dto.ApiResponse
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.example.reports.presentation.dto.ReportResponse
+import org.example.reports.presentation.dto.UpdateReportStatusRequest
 import org.example.reports.presentation.mapper.ReportDtoMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,6 +20,7 @@ class ReportController(
     private val createReportUseCase: CreateReportUseCase,
     private val reportQueryService: GetReportsUseCase,
     private val deleteReportUseCase: DeleteReportUseCase,
+    private val updateReportStatusUseCase: UpdateReportStatusUseCase,
     private val mapper: ReportDtoMapper,
 ) {
     @PostMapping(consumes = ["multipart/form-data"])
@@ -67,6 +70,24 @@ class ReportController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "Reporte eliminado exitosamente"
+            )
+        )
+    }
+
+    @PatchMapping("/{id}/status")
+    fun updateStatus(
+        @PathVariable id: Long,
+        @RequestBody request: UpdateReportStatusRequest
+    ): ResponseEntity<ApiResponse<Unit>> {
+
+        updateReportStatusUseCase.execute(
+            reportId = id,
+            status = request.status
+        )
+
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "Estado actualizado exitosamente"
             )
         )
     }

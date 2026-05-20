@@ -1,98 +1,75 @@
 package com.example.mobile.presentation.admin
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobile.domain.model.ReportStatus
-import com.example.mobile.domain.usecase.GetAllReportsUseCase
-import com.example.mobile.domain.usecase.UpdateReportStatusUseCase
-import com.example.mobile.presentation.utils.UiEvent
+import com.example.mobile.core.util.TokenManager
+import com.example.mobile.data.remote.api.ReportApi
+import com.example.mobile.data.remote.dto.ReportResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class AdminUiState(
+    val isLoading: Boolean = false,
+    val reports: List<ReportResponse> = emptyList(),
+    val error: String? = null,
+    val updatingId: Long? = null
+)
+
 @HiltViewModel
 class AdminViewModel @Inject constructor(
-    private val getAllReportsUseCase: GetAllReportsUseCase,
-    private val updateReportStatusUseCase: UpdateReportStatusUseCase
+    private val reportApi: ReportApi,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(AdminUiState())
-        private set
-
-    private val _event = Channel<UiEvent>()
-    val event = _event.receiveAsFlow()
+    private val _uiState = MutableStateFlow(AdminUiState())
+    val uiState: StateFlow<AdminUiState> = _uiState.asStateFlow()
 
     init {
-        loadReports()
+        loadAllReports()
     }
 
-    fun loadReports() {
+    fun loadAllReports() {
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
             try {
-                val reports = getAllReportsUseCase()
-                uiState = uiState.copy(
-                    reports = reports,
-                    filteredReports = reports,
-                    isLoading = false
+                val reports = reportApi.getAllReports() // 🔥 necesitas este endpoint
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    reports = reports
                 )
             } catch (e: Exception) {
-                uiState = uiState.copy(isLoading = false, error = e.message ?: "Error desconocido")
-                _event.send(UiEvent.ShowSnackbar("Error al cargar reportes", isError = true))
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Error desconocido"
+                )
             }
         }
     }
 
-    fun updateStatus(reportId: Long, newStatus: ReportStatus) {
+    fun updateStatus(reportId: Long, newStatus: String) {
         viewModelScope.launch {
             try {
-                updateReportStatusUseCase(reportId, newStatus)
-                loadReports()
-                _event.send(UiEvent.ShowSnackbar("Estado actualizado correctamente", isError = false))
+                _uiState.value = _uiState.value.copy(updatingId = reportId)
+
+                reportApi.updateReportStatus(
+                    reportId,
+                    mapOf("status" to newStatus)
+                )
+
+                loadAllReports()
+
             } catch (e: Exception) {
-                _event.send(UiEvent.ShowSnackbar("Error al actualizar estado", isError = true))
+                _uiState.value = _uiState.value.copy(
+                    error = e.message ?: "Error al actualizar"
+                )
+            } finally {
+                _uiState.value = _uiState.value.copy(updatingId = null)
             }
         }
-    }
-
-    fun filterByStatus(status: ReportStatus?) {
-        uiState = uiState.copy(selectedStatus = status)
-        applyFilters()
-    }
-
-    fun filterByCategory(category: String?) {
-        uiState = uiState.copy(selectedCategory = category)
-        applyFilters()
-    }
-
-    fun onSearchQueryChange(query: String) {
-        uiState = uiState.copy(searchQuery = query)
-        applyFilters()
-    }
-
-    private fun applyFilters() {
-        var result = uiState.reports
-
-        uiState.selectedStatus?.let { status ->
-            result = result.filter { it.status == status.name }
-        }
-
-        uiState.selectedCategory?.let { category ->
-            result = result.filter { it.category.equals(category, ignoreCase = true) }
-        }
-
-        if (uiState.searchQuery.isNotBlank()) {
-            result = result.filter {
-                it.description.contains(uiState.searchQuery, ignoreCase = true) ||
-                        it.approximateLocation.contains(uiState.searchQuery, ignoreCase = true)
-            }
-        }
-
-        uiState = uiState.copy(filteredReports = result)
     }
 }

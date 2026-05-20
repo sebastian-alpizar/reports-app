@@ -11,5 +11,8 @@ data class ReportResponse(
     val reportDate: LocalDateTime,
     val category: String?,
     val status: String?,
-    val userId: Long
+    val userName: String,
+    val userEmail: String,
+    val userId: Long,
+    val photoUrl: String?
 )
