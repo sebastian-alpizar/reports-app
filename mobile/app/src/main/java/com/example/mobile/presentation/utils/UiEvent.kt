@@ -9,4 +9,5 @@ sealed class UiEvent {
 
     object NavigateHome : UiEvent()
     object NavigateLogin : UiEvent()
+    object NavigateAdmin : UiEvent()
 }

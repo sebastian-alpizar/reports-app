@@ -14,11 +14,12 @@ class JwtService(
         Keys.hmacShaKeyFor(secret.toByteArray())
     }
 
-    fun generateToken(email: String, id: Long, name: String): String {
+    fun generateToken(email: String, id: Long, name: String, isAdmin: Boolean): String {
         return Jwts.builder()
             .setSubject(email)
             .claim("id", id)       // ← nuevo
-            .claim("name", name)   // ← nuevo
+            .claim("name", name)
+            .claim("is_admin", isAdmin)// ← nuevo
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60))
             .signWith(key)

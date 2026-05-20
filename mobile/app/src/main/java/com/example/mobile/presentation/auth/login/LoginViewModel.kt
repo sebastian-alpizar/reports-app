@@ -63,7 +63,16 @@ class LoginViewModel @Inject constructor(
             result.fold(
                 onSuccess = { token ->
                     tokenManager.saveToken(token)
-                    _event.emit(UiEvent.NavigateHome)
+                    android.util.Log.d("JWT_TOKEN", token)
+                    // Decodifica y guarda is_admin desde el JWT
+                    val isAdmin = tokenManager.isAdmin()
+                    tokenManager.saveIsAdmin(isAdmin) // ✅ persiste el valor
+
+                    if (isAdmin) {
+                        _event.emit(UiEvent.NavigateAdmin)
+                    } else {
+                        _event.emit(UiEvent.NavigateHome)
+                    }
                 },
                 onFailure = {
                     _event.emit(

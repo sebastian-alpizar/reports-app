@@ -30,13 +30,19 @@ fun LoginScreen(
                         popUpTo("login") { inclusive = true }
                     }
                 }
+
                 UiEvent.NavigateLogin -> {  // ← agrega esto
                     navController.navigate("login") {
                         popUpTo(0) { inclusive = true }
                     }
                 }
 
-                UiEvent.NavigateLogin -> { }
+                UiEvent.NavigateAdmin -> {
+                    navController.navigate("admin") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+
             }
         }
     }

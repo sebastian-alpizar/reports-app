@@ -8,7 +8,8 @@ data class AdminUiState(
     val filteredReports: List<ReportResponse> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
+    val searchQuery: String = "",
     val selectedStatus: ReportStatus? = null,
-    val selectedCategory: String? = null,
-    val searchQuery: String = ""
+    val selectedCategory: String? = null
+
 )

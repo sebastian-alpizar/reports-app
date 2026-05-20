@@ -89,7 +89,9 @@ fun HomeScreen(
                 userName  = uiState.userName,
                 userEmail = uiState.userEmail,
                 onHistorial = {
-                    scope.launch { drawerState.close() }
+                    scope.launch { drawerState.close()
+                    }
+                    navController.navigate("history")
                 },
                 onPerfil = {
                     scope.launch { drawerState.close() }

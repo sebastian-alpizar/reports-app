@@ -72,10 +72,11 @@ fun AdminScreen(
                 }
             }
 
-            // Stats
-            val pending    = uiState.reports.count { it.status == "PENDING" }
-            val inProgress = uiState.reports.count { it.status == "IN_PROGRESS" }
-            val resolved   = uiState.reports.count { it.status == "RESOLVED" }
+            val reports = uiState.reports ?: emptyList()
+
+            val pending = reports.count { it.status == "PENDING" }
+            val inProgress = reports.count { it.status == "IN_PROGRESS" }
+            val resolved = reports.count { it.status == "RESOLVED" }
 
             Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 StatChip("Pendientes", pending,    PendingColor,    Modifier.weight(1f))

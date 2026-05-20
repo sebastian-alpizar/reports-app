@@ -25,6 +25,10 @@ interface ReportApi {
         @Body body: Map<String, String>
     )
 
+    @GET("reports/user/{userId}")
+    suspend fun getReportsByUser(
+        @Path("userId") userId: Long?
+    ): List<ReportResponse>
 
     @GET("users/{id}")
     suspend fun getUserById(@Path("id") id: Long): UserDto

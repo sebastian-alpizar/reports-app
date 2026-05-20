@@ -23,15 +23,28 @@ fun RegisterScreen(
     LaunchedEffect(true) {
         viewModel.event.collect { event ->
             when (event) {
+
                 is UiEvent.ShowSnackbar -> {
                     snackbarState.show(event.message, event.isError)
                 }
+
                 UiEvent.NavigateHome -> {
                     navController.navigate("home") {
                         popUpTo("register") { inclusive = true }
                     }
                 }
-                UiEvent.NavigateLogin -> { } // ← agrega esto (no hace nada en register)
+
+                UiEvent.NavigateLogin -> {
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }
+
+                UiEvent.NavigateAdmin -> {
+                    navController.navigate("admin") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }
             }
         }
     }
