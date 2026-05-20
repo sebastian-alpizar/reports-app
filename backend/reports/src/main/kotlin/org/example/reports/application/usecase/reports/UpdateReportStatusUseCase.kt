@@ -9,25 +9,13 @@ class UpdateReportStatusUseCase(
     private val reportRepository: ReportRepository
 ) {
 
-    fun execute(
-        reportId: Long,
-        status: String
-    ) {
-
-        val reportStatus = when(status.uppercase()) {
-
-            "PENDIENTE" -> ReportStatus.PENDING
-
-            "EN PROCESO" -> ReportStatus.REJECTED
-
-            "RESUELTO" -> ReportStatus.APPROVED
-
-            else -> ReportStatus.PENDING
+    fun execute(reportId: Long, status: String) {
+        val reportStatus = when (status.uppercase()) {
+            "PENDIENTE"   -> ReportStatus.PENDING
+            "IN_PROGRESS" -> ReportStatus.REJECTED
+            "RESOLVED"    -> ReportStatus.APPROVED
+            else          -> ReportStatus.PENDING
         }
-
-        reportRepository.updateStatus(
-            reportId = reportId,
-            status = reportStatus
-        )
+        reportRepository.updateStatus(reportId = reportId, status = reportStatus)
     }
 }

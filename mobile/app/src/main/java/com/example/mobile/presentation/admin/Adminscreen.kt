@@ -312,7 +312,7 @@ fun AdminScreen(
                                             viewModel.updateStatus(report.id, status)
                                         },
                                         onDelete = {
-                                            // viewModel.deleteReport(report.id)
+                                            viewModel.deleteReport(report.id)
                                         }
                                     )
                                 }
@@ -335,18 +335,18 @@ fun AdminReportCard(
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-    val statusColor = when (report.status?.lowercase()) {
-        "pendiente"  -> Color(0xFFF59E0B)
-        "en_proceso" -> Color(0xFF3B82F6)
-        "resuelto"   -> Color(0xFF10B981)
-        else         -> AccentPurple
+    val statusColor = when (report.status?.uppercase()) {
+        "PENDIENTE"   -> Color(0xFFF59E0B)
+        "IN_PROGRESS" -> Color(0xFF3B82F6)
+        "RESOLVED"    -> Color(0xFF10B981)
+        else          -> AccentPurple
     }
 
-    val statusTextColor = when (report.status?.lowercase()) {
-        "pendiente"  -> Color(0xFF92400E)
-        "en_proceso" -> Color(0xFF1E3A5F)
-        "resuelto"   -> Color(0xFF064E3B)
-        else         -> Color(0xFF3C3489)
+    val statusTextColor = when (report.status?.uppercase()) {
+        "PENDIENTE"   -> Color(0xFF92400E)
+        "IN_PROGRESS" -> Color(0xFF1E3A5F)
+        "RESOLVED"    -> Color(0xFF064E3B)
+        else          -> Color(0xFF3C3489)
     }
 
     Box(
@@ -409,7 +409,12 @@ fun AdminReportCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = report.status ?: "Sin estado",
+                                text = when (report.status?.uppercase()) {
+                                    "PENDIENTE"   -> "Pendiente"
+                                    "IN_PROGRESS" -> "En proceso"
+                                    "RESOLVED"    -> "Resuelto"
+                                    else          -> report.status ?: "Sin estado"
+                                },
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = statusTextColor
@@ -428,12 +433,16 @@ fun AdminReportCard(
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {
-                        listOf("pendiente", "en_proceso", "resuelto").forEach { status ->
+                        listOf("PENDIENTE", "IN_PROGRESS", "RESOLVED").forEach { status ->
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        text = status.replaceFirstChar { it.uppercase() }
-                                            .replace("_", " ")
+                                        text = when (status) {
+                                            "PENDIENTE"   -> "Pendiente"
+                                            "IN_PROGRESS" -> "En proceso"
+                                            "RESOLVED"    -> "Resuelto"
+                                            else          -> status
+                                        }
                                     )
                                 },
                                 onClick = {

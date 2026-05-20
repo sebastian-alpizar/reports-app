@@ -5,6 +5,7 @@ import android.net.Uri
 import com.example.mobile.data.remote.api.ReportApi
 import com.example.mobile.data.remote.dto.ReportRequest
 import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.domain.model.Report
 import com.example.mobile.domain.model.ReportStatus
 import com.example.mobile.domain.repository.ReportRepository
@@ -70,7 +71,7 @@ class ReportRepositoryImpl @Inject constructor(
         status: ReportStatus
     ): Result<Unit> {
         return try {
-            reportApi.updateReportStatus(id, mapOf("status" to status.name))
+            reportApi.updateReportStatus(id, UpdateStatusRequest(status = status.name))
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

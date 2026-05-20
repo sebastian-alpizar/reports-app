@@ -2,6 +2,7 @@ package com.example.mobile.data.remote.api
 
 
 import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.data.remote.dto.UserDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -19,12 +20,6 @@ interface ReportApi {
     @GET("reports")
     suspend fun getAllReports(): List<ReportResponse>
 
-    @PATCH("reports/{id}/status")
-    suspend fun updateReportStatus(
-        @Path("id") id: Long,
-        @Body body: Map<String, String>
-    )
-
     @GET("reports/user/{userId}")
     suspend fun getReportsByUser(
         @Path("userId") userId: Long?
@@ -32,4 +27,16 @@ interface ReportApi {
 
     @GET("users/{id}")
     suspend fun getUserById(@Path("id") id: Long): UserDto
+
+    @PATCH("reports/{id}/status")
+    suspend fun updateReportStatus(
+        @Path("id") id: Long,
+        @Body body: UpdateStatusRequest
+    )
+
+    @DELETE("reports/{id}")
+    suspend fun deleteReport(
+        @Path("id") id: Long
+    )
 }
+
