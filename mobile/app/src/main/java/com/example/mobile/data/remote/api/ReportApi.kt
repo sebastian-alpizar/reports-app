@@ -38,5 +38,12 @@ interface ReportApi {
     suspend fun deleteReport(
         @Path("id") id: Long
     )
-}
 
+
+    @GET("reports/nearby")
+    suspend fun getNearbyReports(
+        @Query("lat") latitude: Double?,
+        @Query("lng") longitude: Double?,
+        @Query("radiusKm") radiusKm: Double = 5.0
+    ): List<ReportResponse>
+}

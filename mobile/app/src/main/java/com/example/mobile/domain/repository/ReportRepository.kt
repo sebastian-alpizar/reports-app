@@ -17,4 +17,10 @@ interface ReportRepository {
         id: Long,
         status: ReportStatus
     ): Result<Unit>  // ← agregá esto
+
+    suspend fun getNearbyReports(
+        latitude: Double?,
+        longitude: Double?,
+        radiusKm: Double = 5.0
+    ): Result<List<Report>>
 }

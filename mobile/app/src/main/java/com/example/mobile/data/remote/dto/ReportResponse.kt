@@ -6,11 +6,11 @@ data class ReportResponse(
     val approximateLocation: String?,
     val latitude: Double?,
     val longitude: Double?,
-    val reportDate: String,
     val category: String?,
     val status: String?,
     val userName: String?,
     val userEmail: String?,
     val userId: Long?,
-    val photoUrl: String?
+    val photoUrl: String?,
+    val reportDate: String?
 )

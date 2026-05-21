@@ -38,6 +38,11 @@ class ReportRepositoryImpl(
         jpaRepository.deleteById(id)
     }
 
+    override fun findNearby(lat: Double, lng: Double, radiusKm: Double): List<Report> {
+        return jpaRepository.findNearby(lat, lng, radiusKm)
+            .map { mapper.toDomain(it) }
+    }
+
     override fun updateStatus(
         reportId: Long,
         status: ReportStatus

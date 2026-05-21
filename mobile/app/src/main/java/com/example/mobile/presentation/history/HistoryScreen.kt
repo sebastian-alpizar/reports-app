@@ -215,7 +215,7 @@ private fun ReportCard(report: ReportResponse) {
                 StatusChip(report.status)
 
                 Text(
-                    text     = report.reportDate,
+                    text     = report.reportDate.toString(),
                     color    = Color.Black.copy(alpha = 0.55f),
                     fontSize = 11.sp
                 )

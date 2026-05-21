@@ -735,7 +735,7 @@ fun AdminReportCard(
                     )
                     Spacer(Modifier.width(3.dp))
                     Text(
-                        text     = report.reportDate,
+                        text     = report.reportDate.toString(),
                         fontSize = 11.sp,
                         color    = Color.Black.copy(alpha = 0.42f)
                     )

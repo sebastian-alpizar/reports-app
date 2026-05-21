@@ -51,6 +51,15 @@ class ReportController(
             .map { mapper.toResponse(it) }
     }
 
+    @GetMapping("/nearby")
+    fun getNearby(
+        @RequestParam lat: Double,
+        @RequestParam lng: Double,
+        @RequestParam(defaultValue = "5.0") radiusKm: Double
+    ): List<ReportResponse> {
+        return reportQueryService.getNearbyReports(lat, lng, radiusKm)
+            .map { mapper.toResponse(it) }
+    }
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long): ReportResponse {
         return mapper.toResponse(reportQueryService.getReportById(id))

@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
+import com.example.mobile.domain.usecase.GetNearbyReportsUseCase
 import com.example.mobile.domain.usecase.SendReportUseCase
 import com.example.mobile.domain.usecase.location.GetLocationUpdatesUseCase
 import com.example.mobile.domain.usecase.location.HasLocationPermissionUseCase
@@ -26,7 +27,10 @@ data class HomeUiState(
     val shouldRequestPermission: Boolean = false,
     val showReportModal: Boolean = false,
     val userName: String = "",
-    val userEmail: String = ""
+    val userEmail: String = "",
+    val nearbyReports: List<Report> = emptyList(),
+    val isLoadingReports: Boolean = false,
+    val selectedReport: Report? = null
 )
 
 data class ReportFormState(
@@ -42,6 +46,7 @@ class HomeViewModel @Inject constructor(
     private val getLocationUpdatesUseCase: GetLocationUpdatesUseCase,
     private val hasLocationPermissionUseCase: HasLocationPermissionUseCase,
     private val sendReportUseCase: SendReportUseCase,
+    private val getNearbyReportsUseCase: GetNearbyReportsUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -86,9 +91,38 @@ class HomeViewModel @Inject constructor(
                     uiState = uiState.copy(isLoading = false)
                 }
                 .collect { location ->
+                    val prev = uiState.currentLocation
                     uiState = uiState.copy(currentLocation = location, isLoading = false)
+
+                    if (prev == null || distanceMeters(prev, location) > 200) {
+                        loadNearbyReports(location.latitude, location.longitude)
+                    }
+
+//                    uiState = uiState.copy(currentLocation = location, isLoading = false)
                 }
         }
+    }
+
+    fun loadNearbyReports(latitude: Double?, longitude: Double?) {
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoadingReports = true)
+            getNearbyReportsUseCase(latitude, longitude, 5.0)
+                .onSuccess { reports ->
+                    uiState = uiState.copy(nearbyReports = reports, isLoadingReports = false)
+                }
+                .onFailure {
+                    uiState = uiState.copy(isLoadingReports = false)
+                }
+        }
+    }
+
+    fun onReportMarkerClicked(report: Report) {
+        uiState = uiState.copy(selectedReport = report)
+    }
+
+
+    fun onDismissReportDetail() {
+        uiState = uiState.copy(selectedReport = null)
     }
 
     fun toggleReportModal(show: Boolean) {
@@ -115,6 +149,9 @@ class HomeViewModel @Inject constructor(
                 onSuccess = {
                     _event.emit(UiEvent.ShowSnackbar("Reporte enviado exitosamente", false))
                     toggleReportModal(false)
+                    uiState.currentLocation?.let {
+                        loadNearbyReports(it.latitude, it.longitude)
+                    }
                 },
                 onFailure = { error ->
                     _event.emit(UiEvent.ShowSnackbar("Error al enviar reporte: ${error.message}", true))
@@ -153,5 +190,11 @@ class HomeViewModel @Inject constructor(
     fun logout() {
         tokenManager.clear()
         viewModelScope.launch { _event.emit(UiEvent.NavigateLogin) }
+    }
+
+    private fun distanceMeters(a: Location, b: Location): Double {
+        val dx = (b.longitude!! - a.longitude!!) * 111_320 * Math.cos(Math.toRadians(a.latitude!!))
+        val dy = (b.latitude!! - a.latitude) * 110_540
+        return Math.sqrt(dx * dx + dy * dy)
     }
 }

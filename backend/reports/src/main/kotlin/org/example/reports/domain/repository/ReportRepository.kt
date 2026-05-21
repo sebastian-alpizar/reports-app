@@ -14,6 +14,7 @@ interface ReportRepository {
     fun save(report: Report): Report
 
     fun deleteById(id: Long)
+    fun findNearby(lat: Double, lng: Double, radiusKm: Double): List<Report>
 
     fun updateStatus(
         reportId: Long,

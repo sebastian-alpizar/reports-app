@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mobile.presentation.components.AppDrawerContent
+import com.example.mobile.presentation.components.NearbyReportsBadge
+import com.example.mobile.presentation.components.ReportDetailCard
 import com.example.mobile.presentation.components.ReportMapView
 import com.example.mobile.presentation.components.ReportModal
 import com.example.mobile.presentation.components.snackbar.AppSnackbar
@@ -130,7 +132,9 @@ fun HomeScreen(
                                 shouldCenterMap = viewModel.shouldCenterMap,
                                 onMapCentered = { viewModel.onMapCentered() },
                                 modifier = Modifier.fillMaxSize(),
-                                onMapReady = { }
+                                onMapReady = { },
+                                nearbyReports   = uiState.nearbyReports,
+                                onReportClicked = { report -> viewModel.onReportMarkerClicked(report) }
                             )
 
                             if (uiState.isLoading) {
@@ -158,6 +162,26 @@ fun HomeScreen(
                                     Icon(Icons.Default.Menu, "Menú", tint = AccentPurpleLight)
                                 }
                             }
+
+                            NearbyReportsBadge(
+                                reportCount = uiState.nearbyReports.size,
+                                isLoading   = uiState.isLoadingReports,
+                                onClick     = {
+                                    uiState.nearbyReports.firstOrNull()
+                                        ?.let { viewModel.onReportMarkerClicked(it) }
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(start = 16.dp, bottom = 90.dp)
+                            )
+
+                            ReportDetailCard(
+                                report    = uiState.selectedReport,
+                                onDismiss = { viewModel.onDismissReportDetail() },
+                                modifier  = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 16.dp)
+                            )
 
                             if (uiState.showReportModal && uiState.currentLocation != null) {
                                 ReportModal(
