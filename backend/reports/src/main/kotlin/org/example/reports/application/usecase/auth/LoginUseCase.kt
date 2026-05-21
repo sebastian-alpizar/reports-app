@@ -17,6 +17,8 @@ class LoginUseCase(
         val user = userRepository.findByEmail(email)
             ?: throw RuntimeException("Usuario no encontrado")
 
+        println(">>> isAdmin: ${user.isAdmin}")
+
         if (!passwordEncoder.matches(password, user.password)) {
             throw RuntimeException("Credenciales inválidas")
         }
@@ -24,7 +26,8 @@ class LoginUseCase(
         return jwtService.generateToken(
             email = user.email,
             id    = user.id,
-            name  = user.name
+            name  = user.name,
+            isAdmin = user.isAdmin
         )
     }
 }

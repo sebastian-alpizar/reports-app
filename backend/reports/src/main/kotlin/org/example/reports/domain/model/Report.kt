@@ -11,5 +11,6 @@ data class Report(
     val reportDate: LocalDateTime,
     val category: String?,
     val status: ReportStatus,
-    val user: User
+    val user: User,
+    val photoUrl: String?
 )

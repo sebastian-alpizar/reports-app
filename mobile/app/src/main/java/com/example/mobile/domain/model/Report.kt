@@ -1,5 +1,6 @@
 package com.example.mobile.domain.model
 
+
 data class Report(
     val id: String = "",
     val location: Location,

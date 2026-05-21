@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mobile.presentation.admin.AdminScreen
 import com.example.mobile.presentation.auth.login.LoginScreen
 import com.example.mobile.presentation.auth.register.RegisterScreen
+import com.example.mobile.presentation.history.HistoryScreen
 import com.example.mobile.presentation.home.HomeScreen
 import com.example.mobile.presentation.profile.ProfileScreen
 
@@ -18,7 +19,7 @@ fun NavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "login"
     ) {
         composable("login") {
             LoginScreen(navController)
@@ -41,6 +42,7 @@ fun NavGraph() {
         }
 
         // TODO: agregar cuando esté lista
-        // composable("history") { HistoryScreen(navController) }
+        composable("history")
+        { HistoryScreen(navController) }
     }
 }
