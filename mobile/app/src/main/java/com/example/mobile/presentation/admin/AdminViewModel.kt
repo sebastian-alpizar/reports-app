@@ -89,7 +89,10 @@ class AdminViewModel @Inject constructor(
         if (uiState.searchQuery.isNotBlank()) {
             result = result.filter {
                 it.description.contains(uiState.searchQuery, ignoreCase = true) ||
-                        it.approximateLocation.contains(uiState.searchQuery, ignoreCase = true)
+                        (it.approximateLocation?.contains(
+                            uiState.searchQuery,
+                            ignoreCase = true
+                        ) == true)
             }
         }
 

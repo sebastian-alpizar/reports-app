@@ -209,7 +209,7 @@ private fun ReportAdminCard(report: ReportResponse, onStatusChange: (ReportStatu
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(report.category, color = AdminAccent, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text(report.category ?: "Sin categoría", color = AdminAccent, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     Text(report.description, color = Color.White, fontWeight = FontWeight.Medium, fontSize = 15.sp, maxLines = 2)
                 }
                 Spacer(Modifier.width(8.dp))
@@ -222,7 +222,7 @@ private fun ReportAdminCard(report: ReportResponse, onStatusChange: (ReportStatu
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocationOn, null, tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(4.dp))
-                Text(report.approximateLocation, color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text(report.approximateLocation ?: "Ubicación desconocida", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
             }
 
             Spacer(Modifier.height(12.dp))

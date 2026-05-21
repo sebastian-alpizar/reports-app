@@ -8,4 +8,5 @@ interface ReportRepository {
     fun findByUserId(userId: Long): List<Report>
     fun save(report: Report): Report
     fun deleteById(id: Long)
+    fun findNearby(lat: Double, lng: Double, radiusKm: Double): List<Report>
 }

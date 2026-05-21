@@ -20,4 +20,8 @@ class GetReportsUseCase(
     fun getReportsByUser(userId: Long): List<Report> {
         return reportRepository.findByUserId(userId)
     }
+
+    fun getNearbyReports(lat: Double, lng: Double, radiusKm: Double = 5.0): List<Report> {
+        return reportRepository.findNearby(lat, lng, radiusKm)
+    }
 }

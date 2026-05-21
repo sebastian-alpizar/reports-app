@@ -28,4 +28,11 @@ interface ReportApi {
 
     @GET("users/{id}")
     suspend fun getUserById(@Path("id") id: Long): UserDto
+
+    @GET("reports/nearby")
+    suspend fun getNearbyReports(
+        @Query("lat") latitude: Double,
+        @Query("lngSS") longitude: Double,
+        @Query("radiusKm") radiusKm: Double = 5.0
+    ): List<ReportResponse>
 }
