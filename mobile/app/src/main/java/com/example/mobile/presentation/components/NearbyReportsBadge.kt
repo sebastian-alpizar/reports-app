@@ -37,7 +37,7 @@ fun NearbyReportsBadge(
 
     Card(
         modifier = modifier
-            .width(180.dp)
+            .width(150.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
@@ -50,21 +50,21 @@ fun NearbyReportsBadge(
 
         Row(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             // círculo rojo
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
                     .background(DangerRed),
                 contentAlignment = Alignment.Center
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(18.dp),
                         color = Color.White,
                         strokeWidth = 2.dp
                     )
@@ -73,28 +73,28 @@ fun NearbyReportsBadge(
                         Icons.Default.WarningAmber,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             Column {
 
                 Text(
                     text = "Reportes cerca",
                     color = PurpleText,
-                    fontSize = 13.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Medium
                 )
 
                 Text(
                     text = reportCount.toString(),
                     color = Color.Black,
-                    fontSize = 30.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 30.sp
+                    lineHeight = 24.sp
                 )
             }
         }

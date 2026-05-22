@@ -147,7 +147,7 @@ fun HomeScreen(
                             // Botón menú — mismo estilo glass del proyecto
                             Box(
                                 modifier = Modifier
-                                    .padding(16.dp)
+                                    .padding(start = 16.dp, top = 0.dp)
                                     .align(Alignment.TopStart)
                                     .windowInsetsPadding(WindowInsets.statusBars)
                             ) {
@@ -172,14 +172,14 @@ fun HomeScreen(
                                 },
                                 modifier = Modifier
                                     .align(Alignment.BottomStart)
-                                    .padding(start = 16.dp, bottom = 90.dp)
+                                    .padding(start = 16.dp, bottom = 12.dp)
                             )
 
                             ReportDetailCard(
                                 report    = uiState.selectedReport,
                                 onDismiss = { viewModel.onDismissReportDetail() },
                                 modifier  = Modifier
-                                    .align(Alignment.BottomCenter)
+                                    .align(Alignment.Center)
                                     .padding(bottom = 16.dp)
                             )
 

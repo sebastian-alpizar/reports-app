@@ -106,7 +106,7 @@ class HomeViewModel @Inject constructor(
     fun loadNearbyReports(latitude: Double?, longitude: Double?) {
         viewModelScope.launch {
             uiState = uiState.copy(isLoadingReports = true)
-            getNearbyReportsUseCase(latitude, longitude, 5.0)
+            getNearbyReportsUseCase(latitude, longitude, 0.5)
                 .onSuccess { reports ->
                     uiState = uiState.copy(nearbyReports = reports, isLoadingReports = false)
                 }

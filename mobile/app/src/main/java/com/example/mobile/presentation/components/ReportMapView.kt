@@ -144,16 +144,48 @@ fun ReportMapView(
 }
 
 private fun createReportIcon(): Bitmap {
-    val size   = 44
-    val bmp    = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val size = 64
+
+    val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bmp)
-    val paint  = Paint(Paint.ANTI_ALIAS_FLAG)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    // Fondo
     paint.color = Color(0xFFF59E0B).toArgb()
-    canvas.drawRoundRect(RectF(4f, 4f, size - 4f, size - 4f), 12f, 12f, paint)
-    paint.color       = Color.White.toArgb()
-    paint.strokeWidth = 5f
-    paint.strokeCap   = Paint.Cap.ROUND
-    canvas.drawLine(size / 2f, 12f, size / 2f, 26f, paint)
-    canvas.drawCircle(size / 2f, 33f, 3f, paint)
+
+    canvas.drawRoundRect(
+        RectF(
+            size * 0.08f,
+            size * 0.08f,
+            size * 0.92f,
+            size * 0.92f
+        ),
+        size * 0.22f,
+        size * 0.22f,
+        paint
+    )
+
+    // Símbolo blanco
+    paint.color = Color.White.toArgb()
+    paint.strokeWidth = size * 0.09f
+    paint.strokeCap = Paint.Cap.ROUND
+
+    // Línea vertical
+    canvas.drawLine(
+        size / 2f,
+        size * 0.27f,
+        size / 2f,
+        size * 0.58f,
+        paint
+    )
+
+    // Punto
+    canvas.drawCircle(
+        size / 2f,
+        size * 0.74f,
+        size * 0.05f,
+        paint
+    )
+
     return bmp
 }

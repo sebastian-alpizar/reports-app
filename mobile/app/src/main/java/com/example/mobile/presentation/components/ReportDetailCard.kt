@@ -3,6 +3,8 @@ package com.example.mobile.presentation.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,6 +13,8 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobile.domain.model.Report
+import kotlinx.coroutines.delay
 private val AccentPurple = Color(0xFF7C3AED)
 
 @Composable
@@ -26,6 +31,12 @@ fun ReportDetailCard(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+//    LaunchedEffect(report) {
+//        if (report != null) {
+//            delay(5000)
+//            onDismiss()
+//        }
+//    }
     AnimatedVisibility(
         visible = report != null,
         enter   = slideInVertically { it },
@@ -37,7 +48,12 @@ fun ReportDetailCard(
         Surface(
             modifier        = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismiss
+                ),
             shape           = RoundedCornerShape(20.dp),
             color           = Color.White,
             shadowElevation = 8.dp
