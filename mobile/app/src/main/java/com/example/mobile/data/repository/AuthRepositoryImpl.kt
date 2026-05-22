@@ -50,19 +50,16 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<String> {
 
         return try {
-            val response = api.register(
+            api.register(
                 RegisterRequest(name, email, nationalId, password)
             )
-            val token    = response.data.token
-            saveTokenAndClaims(token)
-            Result.success(response.data.token)
-
+            Result.success("Usuario creado correctamente")
         } catch (e: HttpException) {
             val message = parseError(e)
             Result.failure(Exception(message))
-
         } catch (e: Exception) {
-            Result.failure(Exception("Error de conexión"))
+            e.printStackTrace()
+            Result.failure(e)
         }
     }
     private fun saveTokenAndClaims(token: String) {

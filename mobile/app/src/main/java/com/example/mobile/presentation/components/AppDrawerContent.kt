@@ -45,7 +45,7 @@ fun AppDrawerContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.7f))
+                .background(Color.White.copy(alpha = 0.8f))
         ) {
 
             Spacer(

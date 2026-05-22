@@ -145,7 +145,7 @@ fun ReportModal(
                     Text(
                         text = "Reportar Accidente",
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color =   Color(0xFF7C3AED),
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 

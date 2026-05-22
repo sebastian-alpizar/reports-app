@@ -26,7 +26,7 @@ fun AppPasswordField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color.White.copy(alpha = 0.8f)) },
+        label = { Text(label, color =    Color(0xFF7C3AED)) },
         modifier = modifier,
         isError = isError,
         visualTransformation =
@@ -41,12 +41,12 @@ fun AppPasswordField(
                     if (passwordVisible) Icons.Filled.VisibilityOff
                     else Icons.Filled.Visibility,
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.7f)
+                    tint =   Color(0xFF7C3AED)
                 )
             }
         },
 
-        textStyle = LocalTextStyle.current.copy(color = Color.White),
+        textStyle = LocalTextStyle.current.copy(color =   Color(0xFF7C3AED)),
 
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.White.copy(alpha = 0.5f),

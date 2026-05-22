@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.mobile.domain.validation.RegisterValidator
+import kotlinx.coroutines.delay
 
 data class RegisterFormState(
     val nameError: String? = null,
@@ -84,7 +85,8 @@ class RegisterViewModel @Inject constructor(
                             false
                         )
                     )
-                    _event.emit(UiEvent.NavigateHome)
+                    delay(1200)
+                    _event.emit(UiEvent.NavigateLogin)
                 },
                 onFailure = {
                     _event.emit(

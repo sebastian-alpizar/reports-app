@@ -40,7 +40,7 @@ object GlassModifiers {
         Modifier
             .clip(shape)
             .background(
-                Color.White.copy(alpha = 0.5f),
+                Color.White.copy(alpha = 0.7f),
                 shape = shape
             )
 }

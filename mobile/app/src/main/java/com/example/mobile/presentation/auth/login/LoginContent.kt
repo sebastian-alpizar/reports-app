@@ -56,7 +56,7 @@ fun LoginContent(
             Text(
                 text = "Login",
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color =   Color(0xFF7C3AED),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -106,7 +106,7 @@ fun LoginContent(
             Row {
                 Text(
                     "¿Aún no tienes cuenta? ",
-                    color = Color.White.copy(alpha = 0.7f)
+                    color =   Color(0xFF7C3AED),
                 )
 
                 Text(

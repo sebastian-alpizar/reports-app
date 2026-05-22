@@ -35,7 +35,7 @@ fun RegisterContent(
             Text(
                 text = "Crear cuenta",
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color =   Color(0xFF7C3AED),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 

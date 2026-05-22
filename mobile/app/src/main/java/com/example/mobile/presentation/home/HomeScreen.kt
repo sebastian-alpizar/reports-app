@@ -78,6 +78,7 @@ fun HomeScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
         drawerContent = {
             AppDrawerContent (
                 userName  = uiState.userName,

@@ -204,32 +204,32 @@ fun ProfileScreen(
                                 Spacer(Modifier.height(16.dp))
 
                                 // Badge rol
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(50.dp))
-                                        .background(TagBg)
-                                        .padding(horizontal = 18.dp, vertical = 7.dp)
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        Icon(
-                                            if (user.isAdmin) Icons.Default.AdminPanelSettings else Icons.Default.Person,
-                                            null,
-                                            tint = Color.White,
-                                            modifier = Modifier.size(15.dp)
-                                        )
-                                        Spacer(Modifier.width(7.dp))
-                                        Text(
-                                            if (user.isAdmin) "Administrador" else "Ciudadano",
-                                            color = Color.Black,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            letterSpacing = 0.3.sp
-                                        )
-                                    }
-                                }
+//                                Box(
+//                                    modifier = Modifier
+//                                        .clip(RoundedCornerShape(50.dp))
+//                                        .background(TagBg)
+//                                        .padding(horizontal = 18.dp, vertical = 7.dp)
+//                                ) {
+//                                    Row(
+//                                        verticalAlignment = Alignment.CenterVertically,
+//                                        horizontalArrangement = Arrangement.Center
+//                                    ) {
+//                                        Icon(
+//                                            if (user.isAdmin) Icons.Default.AdminPanelSettings else Icons.Default.Person,
+//                                            null,
+//                                            tint = Color.White,
+//                                            modifier = Modifier.size(15.dp)
+//                                        )
+//                                        Spacer(Modifier.width(7.dp))
+//                                        Text(
+//                                            if (user.isAdmin) "Administrador" else "Ciudadano",
+//                                            color = Color.Black,
+//                                            fontSize = 13.sp,
+//                                            fontWeight = FontWeight.SemiBold,
+//                                            letterSpacing = 0.3.sp
+//                                        )
+//                                    }
+//                                }
                             }
                         }
 
@@ -260,7 +260,7 @@ fun ProfileScreen(
                         // ── Info cards ───────────────────────────────────────
                         ProfileInfoCard(Icons.Default.Person,             "Nombre completo",    user.name)
                         ProfileInfoCard(Icons.Default.Email,              "Correo electrónico", user.email)
-                        ProfileInfoCard(Icons.Default.Badge,              "ID de usuario",      "#${user.id}")
+//                        ProfileInfoCard(Icons.Default.Badge,              "ID de usuario",      "#${user.id}")
                         ProfileInfoCard(
                             Icons.Default.AdminPanelSettings,
                             "Rol en el sistema",

@@ -19,11 +19,11 @@ fun AppTextField(
         value = value,
         onValueChange = onValueChange,
         label = {
-            Text(label, color = Color.White.copy(alpha = 0.8f))
+            Text(label, color =   Color(0xFF7C3AED))
         },
         modifier = modifier,
         isError = isError,
-        textStyle = LocalTextStyle.current.copy(color = Color.White),
+        textStyle = LocalTextStyle.current.copy(color =   Color(0xFF7C3AED)),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.White.copy(alpha = 0.5f),
             unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
