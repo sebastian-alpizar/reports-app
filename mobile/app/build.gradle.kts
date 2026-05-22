@@ -5,6 +5,9 @@ plugins {
 
     alias(libs.plugins.hilt)
     kotlin("kapt")
+
+    id("com.google.gms.google-services")
+    id("com.google.firebase.appdistribution")
 }
 
 android {
@@ -107,4 +110,13 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     // Accompanist permissions
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+
+    // Firabase
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation("com.google.firebase:firebase-analytics")
+}
+
+firebaseAppDistribution {
+    artifactType = "APK"
+    testers = "sebastianalpiz@gmail.com,Felixangel87@hotmail.com"
 }
