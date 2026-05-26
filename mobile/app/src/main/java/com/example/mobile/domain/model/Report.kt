@@ -9,5 +9,8 @@ data class Report(
     val createdAt: Long = System.currentTimeMillis(),
     val status: String? = null,
     val approximateLocation: String? = null,
-    val category: String? = null
+    val category: String? = null,
+    val photoUrl: String?= null,
+    val userId: Long? = null,
+    val userName: String? = null
 )

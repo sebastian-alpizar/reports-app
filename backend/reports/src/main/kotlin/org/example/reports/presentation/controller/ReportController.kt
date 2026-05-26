@@ -4,9 +4,11 @@ import org.example.reports.application.usecase.reports.CreateReportUseCase
 import org.example.reports.application.usecase.reports.DeleteReportUseCase
 import org.example.reports.application.usecase.reports.GetReportsUseCase
 import org.example.reports.application.usecase.reports.UpdateReportStatusUseCase
+import org.example.reports.application.usecase.reports.UpdateReportUseCase
 import org.example.reports.presentation.dto.ApiResponse
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.example.reports.presentation.dto.ReportResponse
+import org.example.reports.presentation.dto.UpdateReportRequest
 import org.example.reports.presentation.dto.UpdateReportStatusRequest
 import org.example.reports.presentation.mapper.ReportDtoMapper
 import org.springframework.http.HttpStatus
@@ -21,6 +23,7 @@ class ReportController(
     private val reportQueryService: GetReportsUseCase,
     private val deleteReportUseCase: DeleteReportUseCase,
     private val updateReportStatusUseCase: UpdateReportStatusUseCase,
+    private val updateReportUseCase: UpdateReportUseCase,
     private val mapper: ReportDtoMapper,
 ) {
     @PostMapping(consumes = ["multipart/form-data"])
@@ -69,6 +72,26 @@ class ReportController(
     fun getByUser(@PathVariable userId: Long): List<ReportResponse> {
         return reportQueryService.getReportsByUser(userId)
             .map { mapper.toResponse(it) }
+    }
+
+    @PutMapping("/{id}", consumes = ["multipart/form-data"])
+    fun updateReport(
+        @PathVariable id: Long,
+        @RequestPart("report") reportData: UpdateReportRequest,
+        @RequestPart(value = "photo", required = false) photo: MultipartFile?
+    ): ResponseEntity<ApiResponse<ReportResponse>> {
+        return try {
+            val updated = updateReportUseCase.execute(id, reportData, photo)
+            ResponseEntity.ok(
+                ApiResponse(message = "Reporte actualizado exitosamente", data = mapper.toResponse(updated))
+            )
+        } catch (e: RuntimeException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse(message = e.message ?: "Sin permiso"))
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse(message = "Error: ${e.message}"))
+        }
     }
 
     @DeleteMapping("/{id}")
