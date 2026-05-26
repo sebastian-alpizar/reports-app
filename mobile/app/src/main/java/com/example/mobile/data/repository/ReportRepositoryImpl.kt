@@ -110,6 +110,15 @@ class ReportRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteReport(reportId: String): Result<Unit> {
+        return try {
+            reportApi.deleteReport(reportId.toLong())
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     private fun ReportResponse.toDomain() = Report(
         id                  = this.id.toString(),
         location            = Location(latitude = this.latitude, longitude = this.longitude),

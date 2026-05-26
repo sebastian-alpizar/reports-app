@@ -31,4 +31,6 @@ interface ReportRepository {
         imageUri: String?
     ): Result<Unit>
 
+    suspend fun deleteReport(reportId: String): Result<Unit>
+
 }

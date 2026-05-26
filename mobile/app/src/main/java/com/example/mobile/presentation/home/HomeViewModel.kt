@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
+import com.example.mobile.domain.usecase.DeleteReportUseCase
 import com.example.mobile.domain.usecase.GetNearbyReportsUseCase
 import com.example.mobile.domain.usecase.SendReportUseCase
 import com.example.mobile.domain.usecase.UpdateReportUseCase
@@ -49,6 +50,7 @@ class HomeViewModel @Inject constructor(
     private val hasLocationPermissionUseCase: HasLocationPermissionUseCase,
     private val sendReportUseCase: SendReportUseCase,
     private val updateReportUseCase: UpdateReportUseCase,
+    private val deleteReportUseCase: DeleteReportUseCase,
     private val getNearbyReportsUseCase: GetNearbyReportsUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
@@ -80,11 +82,8 @@ class HomeViewModel @Inject constructor(
 
     private fun checkPermissionAndStartUpdates() {
         viewModelScope.launch {
-            if (hasLocationPermissionUseCase()) {
-                startLocationUpdates()
-            } else {
-                uiState = uiState.copy(shouldRequestPermission = true, isLoading = false)
-            }
+            if (hasLocationPermissionUseCase()) startLocationUpdates()
+            else uiState = uiState.copy(shouldRequestPermission = true, isLoading = false)
         }
     }
 
@@ -132,6 +131,20 @@ class HomeViewModel @Inject constructor(
     fun onEditReport(report: Report) {
         reportFormState = ReportFormState(description = report.description)
         uiState = uiState.copy(editingReport = report, showReportModal = true)
+    }
+
+    fun onDeleteReport(report: Report) {
+        viewModelScope.launch {
+            deleteReportUseCase(report.id)
+                .onSuccess {
+                    uiState = uiState.copy(selectedReport = null)
+                    _event.emit(UiEvent.ShowSnackbar("Reporte eliminado", false))
+                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
+                }
+                .onFailure { error ->
+                    _event.emit(UiEvent.ShowSnackbar("Error al eliminar: ${error.message}", true))
+                }
+        }
     }
 
     fun toggleReportModal(show: Boolean) {

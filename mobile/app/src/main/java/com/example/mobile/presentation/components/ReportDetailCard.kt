@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +31,7 @@ import coil.compose.AsyncImage
 import com.example.mobile.domain.model.Report
 import kotlinx.coroutines.delay
 private val AccentPurple = Color(0xFF7C3AED)
+private val DangerRed    = Color(0xFFE53935)
 
 @Composable
 fun ReportDetailCard(
@@ -35,14 +39,51 @@ fun ReportDetailCard(
     currentUserId: Long?,
     onDismiss: () -> Unit,
     onEditClicked: (Report) -> Unit,
+    onDeleteClicked: (Report) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(report) {
         if (report != null) {
             delay(8000)
             onDismiss()
         }
+    }
+
+    if (showDeleteDialog && report != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = {
+                Text(
+                    text       = "Eliminar reporte",
+                    fontWeight = FontWeight.Bold,
+                    color      = Color(0xFF1F1F1F)
+                )
+            },
+            text = {
+                Text(
+                    text  = "¿Estás seguro que deseas eliminar este reporte? Esta acción no se puede deshacer.",
+                    color = Color(0xFF1F1F1F).copy(alpha = 0.7f)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDeleteClicked(report)
+                    }
+                ) {
+                    Text("Eliminar", color = DangerRed, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar", color = AccentPurple)
+                }
+            }
+        )
     }
 
     AnimatedVisibility(
@@ -105,8 +146,22 @@ fun ReportDetailCard(
                                 modifier           = Modifier.size(20.dp)
                             )
                         }
+
+                        // Eliminar reporte
+                        IconButton(
+                            onClick  = { showDeleteDialog = true },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector        = Icons.Filled.Delete,
+                                contentDescription = "Eliminar reporte",
+                                tint               = DangerRed,
+                                modifier           = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(10.dp))
 

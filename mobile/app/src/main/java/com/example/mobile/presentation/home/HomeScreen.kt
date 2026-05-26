@@ -182,6 +182,7 @@ fun HomeScreen(
                                 currentUserId = viewModel.currentUserId,
                                 onDismiss     = { viewModel.onDismissReportDetail() },
                                 onEditClicked = { report -> viewModel.onEditReport(report) },
+                                onDeleteClicked = { report -> viewModel.onDeleteReport(report) },
                                 modifier      = Modifier
                                     .align(Alignment.Center)
                                     .padding(bottom = 16.dp)
