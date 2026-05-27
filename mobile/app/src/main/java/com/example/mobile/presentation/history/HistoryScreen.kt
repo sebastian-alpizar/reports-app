@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.presentation.components.AppBackground
+import com.example.mobile.presentation.utils.DateFormatter
 
 // ── COLORES ───────────────────────────────────────────────────────────────────
 private val AccentPurple      = Color(0xFF7C3AED)
@@ -215,7 +216,8 @@ private fun ReportCard(report: ReportResponse) {
                 StatusChip(report.status)
 
                 Text(
-                    text     = report.reportDate.toString(),
+                    text     = DateFormatter.formatDate(report.reportDate),
+
                     color    = Color.Black.copy(alpha = 0.55f),
                     fontSize = 11.sp
                 )

@@ -9,6 +9,7 @@ import com.example.mobile.presentation.auth.login.LoginScreen
 import com.example.mobile.presentation.auth.register.RegisterScreen
 import com.example.mobile.presentation.history.HistoryScreen
 import com.example.mobile.presentation.home.HomeScreen
+import com.example.mobile.presentation.notification.NotificationsScreen
 import com.example.mobile.presentation.profile.ProfileScreen
 
 import com.example.mobile.presentation.profile.ProfileScreen
@@ -41,8 +42,12 @@ fun NavGraph() {
            ProfileScreen(navController)
         }
 
-        // TODO: agregar cuando esté lista
-        composable("history")
-        { HistoryScreen(navController) }
+        composable("history") {
+            HistoryScreen(navController)
+        }
+
+        composable("notifications") {
+            NotificationsScreen(navController)
+        }
     }
 }

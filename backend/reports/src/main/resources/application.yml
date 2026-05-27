@@ -7,6 +7,9 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  mongodb:
+    uri: ${MONGO_URI}
+
   servlet:
     multipart:
       max-file-size: 10MB

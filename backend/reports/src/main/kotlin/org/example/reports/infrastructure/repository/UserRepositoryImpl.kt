@@ -36,4 +36,9 @@ class UserRepositoryImpl(
     override fun existsByNationalId(id: String): Boolean {
         return jpaRepository.existsByNationalId(id)
     }
+
+    override fun findByIsAdminTrue(): List<User> {
+        return jpaRepository.findByIsAdminTrue()
+            .map { mapper.toDomain(it) }
+    }
 }

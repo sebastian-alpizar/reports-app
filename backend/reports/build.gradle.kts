@@ -43,6 +43,9 @@ dependencies {
 
     // Para fotos en Cloudinay
     implementation("com.cloudinary:cloudinary-http44:1.33.0")
+
+    // Para Mongo
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 }
 
 kapt {

@@ -28,6 +28,7 @@ data class HomeUiState(
     val showReportModal: Boolean = false,
     val userName: String = "",
     val userEmail: String = "",
+    val isAdmin: Boolean = false,
     val nearbyReports: List<Report> = emptyList(),
     val isLoadingReports: Boolean = false,
     val selectedReport: Report? = null
@@ -69,7 +70,8 @@ class HomeViewModel @Inject constructor(
         checkPermissionAndStartUpdates()
         uiState = uiState.copy(
             userName  = tokenManager.getUserName()  ?: "Usuario",
-            userEmail = tokenManager.getUserEmail() ?: ""
+            userEmail = tokenManager.getUserEmail() ?: "",
+            isAdmin = tokenManager.isAdmin(),
         )
     }
 

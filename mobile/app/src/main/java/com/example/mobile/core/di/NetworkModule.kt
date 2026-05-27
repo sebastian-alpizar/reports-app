@@ -2,6 +2,7 @@ package com.example.mobile.core.di
 
 import com.example.mobile.data.remote.api.AuthApi
 import com.example.mobile.core.network.AuthInterceptor
+import com.example.mobile.data.remote.api.NotificationApi
 import com.example.mobile.data.remote.api.ReportApi
 import dagger.Module
 import dagger.Provides
@@ -65,5 +66,14 @@ object NetworkModule {
         retrofit: Retrofit
     ): ReportApi {
         return retrofit.create(ReportApi::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideNotificationApi(
+        retrofit: Retrofit
+    ): NotificationApi {
+        return retrofit.create(NotificationApi::class.java)
     }
 }

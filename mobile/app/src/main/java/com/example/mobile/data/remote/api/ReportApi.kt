@@ -1,6 +1,5 @@
 package com.example.mobile.data.remote.api
 
-
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.data.remote.dto.UserDto

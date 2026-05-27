@@ -2,9 +2,11 @@ package com.example.mobile.core.di
 
 import com.example.mobile.data.repository.AuthRepositoryImpl
 import com.example.mobile.data.repository.LocationRepositoryImpl
+import com.example.mobile.data.repository.NotificationRepositoryImpl
 import com.example.mobile.data.repository.ReportRepositoryImpl
 import com.example.mobile.domain.repository.AuthRepository
 import com.example.mobile.domain.repository.LocationRepository
+import com.example.mobile.domain.repository.NotificationRepository
 import com.example.mobile.domain.repository.ReportRepository
 import dagger.Binds
 import dagger.Module
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindReportRepository(
         reportRepositoryImpl: ReportRepositoryImpl
     ): ReportRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationRepository(
+        notificationRepositoryImpl: NotificationRepositoryImpl
+    ): NotificationRepository
 }
