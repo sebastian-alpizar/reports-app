@@ -1,6 +1,7 @@
 package com.example.mobile.presentation.history
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,17 +15,22 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.presentation.components.AppBackground
 import com.example.mobile.presentation.utils.DateFormatter
@@ -34,7 +40,7 @@ private val AccentPurple      = Color(0xFF7C3AED)
 private val AccentPurpleLight = Color(0xFF9F67FA)
 private val CardBg            = Color.White.copy(alpha = 0.5f)
 
-// ── ENUM DE ESTADOS (igual que AdminScreen) ───────────────────────────────────
+// ── ENUM DE ESTADOS ───────────────────────────────────────────────────────────
 private enum class ReportStatus(
     val apiValue : String,
     val label    : String,
@@ -164,35 +170,64 @@ fun HistoryScreen(
 // ── CARD ──────────────────────────────────────────────────────────────────────
 @Composable
 private fun ReportCard(report: ReportResponse) {
+    var showFullImage by remember { mutableStateOf(false) }
+
+    // Dialog para ver foto en grande
+    if (showFullImage && report.photoUrl != null) {
+        AlertDialog(
+            onDismissRequest = { showFullImage = false },
+            confirmButton = {},
+            text = {
+                AsyncImage(
+                    model              = report.photoUrl,
+                    contentDescription = "Foto ampliada",
+                    contentScale       = ContentScale.Fit,
+                    modifier           = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(CardBg)
-            .padding(16.dp)
     ) {
         Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(
-                            Brush.linearGradient(listOf(AccentPurpleLight, AccentPurple))
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Description,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }
 
-                Spacer(modifier = Modifier.width(12.dp))
+            // Foto clickeable
+            report.photoUrl?.let { url ->
+                AsyncImage(
+                    model              = url,
+                    contentDescription = "Foto del reporte",
+                    contentScale       = ContentScale.Crop,
+                    modifier           = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .clickable { showFullImage = true }  // <-- abre en grande
+                )
+            }
 
-                Column {
-                    Spacer(modifier = Modifier.height(4.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                Brush.linearGradient(listOf(AccentPurpleLight, AccentPurple))
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Description, contentDescription = null, tint = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
                     Text(
                         text       = report.description,
                         color      = Color.Black.copy(alpha = 0.7f),
@@ -200,27 +235,23 @@ private fun ReportCard(report: ReportResponse) {
                         lineHeight = 18.sp
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(14.dp))
+                HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
+                Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier              = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
-            ) {
-                StatusChip(report.status)
-
-                Text(
-                    text     = DateFormatter.formatDate(report.reportDate),
-
-                    color    = Color.Black.copy(alpha = 0.55f),
-                    fontSize = 11.sp
-                )
+                Row(
+                    modifier              = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment     = Alignment.CenterVertically
+                ) {
+                    StatusChip(report.status)
+                    Text(
+                        text     = DateFormatter.formatDate(report.reportDate),
+                        color    = Color.Black.copy(alpha = 0.55f),
+                        fontSize = 11.sp
+                    )
+                }
             }
         }
     }

@@ -50,7 +50,7 @@ private enum class ReportStatus(
         apiValue  = "PENDING",
         label     = "Pendiente",
         desc      = "Sin atender aún",
-        dot       = Color(0xFFAB8BF5),   // lila claro
+        dot       = Color(0xFFAB8BF5),
         bgColor   = Color(0xFFAB8BF5),
         textColor = Color(0xFF5B21B6)
     ),
@@ -58,7 +58,7 @@ private enum class ReportStatus(
         apiValue  = "REJECTED",
         label     = "En proceso",
         desc      = "Se está atendiendo",
-        dot       = Color(0xFF7C3AED),   // morado medio
+        dot       = Color(0xFF7C3AED),
         bgColor   = Color(0xFF7C3AED),
         textColor = Color(0xFF3B0764)
     ),
@@ -66,7 +66,7 @@ private enum class ReportStatus(
         apiValue  = "APPROVED",
         label     = "Resuelto",
         desc      = "Caso cerrado",
-        dot       = Color(0xFF4C1D95),   // morado oscuro
+        dot       = Color(0xFF4C1D95),
         bgColor   = Color(0xFF4C1D95),
         textColor = Color(0xFFEDE9FE)
     );
@@ -76,6 +76,7 @@ private enum class ReportStatus(
             entries.firstOrNull { it.apiValue.equals(value, ignoreCase = true) } ?: PENDING
     }
 }
+
 // ── PANTALLA PRINCIPAL ────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +84,7 @@ fun AdminScreen(
     navController: NavController,
     viewModel: AdminViewModel = hiltViewModel()
 ) {
-    val uiState     by viewModel.uiState.collectAsState()
+    val uiState        by viewModel.uiState.collectAsState()
     var searchQuery    by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf<ReportStatus?>(null) }
 
@@ -107,9 +108,9 @@ fun AdminScreen(
     }
 
     AppBackground {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+
+            // ── TOP BAR ───────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -123,7 +124,6 @@ fun AdminScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier          = Modifier.fillMaxWidth()
                 ) {
-
                     IconButton(
                         onClick = {
                             navController.navigate("home") {
@@ -136,16 +136,13 @@ fun AdminScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(
-                                    AccentPurple.copy(alpha = 0.2f)
-                                ),
+                                .background(AccentPurple.copy(alpha = 0.2f)),
                             contentAlignment = Alignment.Center
                         ) {
-
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint = Color.White,
+                                tint     = Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -166,30 +163,10 @@ fun AdminScreen(
                             color    = Color.Black.copy(alpha = 0.45f)
                         )
                     }
-//
-//                    Box(
-//                        modifier = Modifier
-//                            .size(34.dp)
-//                            .clip(RoundedCornerShape(10.dp))
-//                            .background(AccentPurple.copy(alpha = 0.1f)),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        IconButton(
-//                            onClick  = { viewModel.loadAllReports() },
-//                            modifier = Modifier.size(34.dp)
-//                        ) {
-//                            Icon(
-//                                Icons.Default.Refresh,
-//                                contentDescription = "Actualizar",
-//                                tint     = AccentPurple,
-//                                modifier = Modifier.size(17.dp)
-//                            )
-//                        }
-//                    }
                 }
             }
 
-            // ── CONTENIDO ────────────────────────────────
+            // ── CONTENIDO ─────────────────────────────────
             when {
                 uiState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -272,7 +249,6 @@ fun AdminScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 contentPadding        = PaddingValues(horizontal = 0.dp)
                             ) {
-                                // Chip "Todos"
                                 item {
                                     val isSelected = selectedFilter == null
                                     Surface(
@@ -308,10 +284,10 @@ fun AdminScreen(
                                                         .padding(horizontal = 6.dp, vertical = 1.dp)
                                                 ) {
                                                     Text(
-                                                        text      = "${uiState.reports.size}",
-                                                        fontSize  = 10.sp,
+                                                        text       = "${uiState.reports.size}",
+                                                        fontSize   = 10.sp,
                                                         fontWeight = FontWeight.Medium,
-                                                        color     = if (isSelected) AccentPurple
+                                                        color      = if (isSelected) AccentPurple
                                                         else Color.White.copy(alpha = 0.5f)
                                                     )
                                                 }
@@ -320,7 +296,6 @@ fun AdminScreen(
                                     }
                                 }
 
-                                // Chips por estado
                                 items(ReportStatus.entries) { statusOption ->
                                     val isSelected = selectedFilter == statusOption
                                     val count = uiState.reports.count {
@@ -485,6 +460,20 @@ fun AdminReportCard(
                 }
             }
 
+            // ── IMAGEN SIEMPRE VISIBLE ────────────────────
+            report.photoUrl?.let { url ->
+                Spacer(Modifier.height(12.dp))
+                AsyncImage(
+                    model              = url,
+                    contentDescription = "Foto del reporte",
+                    contentScale       = ContentScale.Crop,
+                    modifier           = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                )
+            }
+
             Spacer(Modifier.height(13.dp))
             HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
             Spacer(Modifier.height(11.dp))
@@ -642,7 +631,7 @@ fun AdminReportCard(
                 }
             }
 
-            // ── DETALLE EXPANDIBLE ────────────────────────
+            // ── DETALLE EXPANDIBLE (sin imagen, ya está arriba) ──────────
             AnimatedVisibility(
                 visible = detailExpanded,
                 enter   = expandVertically(),
@@ -653,27 +642,13 @@ fun AdminReportCard(
                     HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
                     Spacer(Modifier.height(12.dp))
 
-                    report.photoUrl?.let { url ->
-                        AsyncImage(
-                            model              = url,
-                            contentDescription = "Foto del reporte",
-                            contentScale       = ContentScale.Crop,
-                            modifier           = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                                .clip(RoundedCornerShape(14.dp))
-                        )
-                        Spacer(Modifier.height(12.dp))
-                    }
-
-                    report.userName?.let { DetailRow(Icons.Default.Person, "Usuario", it) }
-                    report.userEmail?.let { DetailRow(Icons.Default.Email, "Correo", it) }
-                    report.approximateLocation?.let { DetailRow(Icons.Default.LocationOn, "Ubicación", it) }
+                    report.userName?.let            { DetailRow(Icons.Default.Person,      "Usuario",     it) }
+                    report.userEmail?.let           { DetailRow(Icons.Default.Email,        "Correo",      it) }
+                    report.approximateLocation?.let { DetailRow(Icons.Default.LocationOn,   "Ubicación",   it) }
                     if (report.latitude != null && report.longitude != null) {
                         DetailRow(Icons.Default.MyLocation, "Coordenadas", "${report.latitude}, ${report.longitude}")
                     }
                     report.category?.let { DetailRow(Icons.Default.Category, "Categoría", it) }
-                    // DetailRow(Icons.Default.Tag, "ID", "#${report.id}")
                 }
             }
 

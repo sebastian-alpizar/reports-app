@@ -11,16 +11,15 @@ class GetReportsUseCase(
     private val photoRepository: PhotoRepository
 ) {
     fun getAllReports(): List<Report> {
-        return reportRepository.findAll()
+        return reportRepository.findAll().map { it.withPhoto() }
     }
-
     fun getReportById(id: Long): Report {
         return reportRepository.findById(id)
             ?: throw RuntimeException("Reporte no encontrado")
     }
 
     fun getReportsByUser(userId: Long): List<Report> {
-        return reportRepository.findByUserId(userId)
+        return reportRepository.findByUserId(userId).map { it.withPhoto() }
     }
 
     fun getNearbyReports(lat: Double, lng: Double, radiusKm: Double = 5.0): List<Report> {
