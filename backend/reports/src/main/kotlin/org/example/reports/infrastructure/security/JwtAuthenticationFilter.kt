@@ -44,11 +44,11 @@ class JwtAuthenticationFilter(
             )
 
             auth.details = WebAuthenticationDetailsSource().buildDetails(request)
-
             SecurityContextHolder.getContext().authentication = auth
 
         } catch (e: Exception) {
             // Token inválido, no autentica
+            println("JWT ERROR: ${e.message}")
         }
 
         filterChain.doFilter(request, response)

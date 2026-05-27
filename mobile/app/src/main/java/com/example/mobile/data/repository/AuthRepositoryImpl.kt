@@ -5,6 +5,7 @@ import com.example.mobile.core.util.TokenManager
 import com.example.mobile.data.remote.api.AuthApi
 import com.example.mobile.data.remote.dto.LoginRequest
 import com.example.mobile.data.remote.dto.RegisterRequest
+import com.example.mobile.data.remote.util.ErrorParser
 import com.example.mobile.domain.repository.AuthRepository
 import retrofit2.HttpException
 import org.json.JSONObject
@@ -31,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
 
         } catch (e: HttpException) {
 
-            val message = parseError(e)
+            val message = ErrorParser.parseError(e)
 
             Result.failure(Exception(message))
 
@@ -55,7 +56,7 @@ class AuthRepositoryImpl @Inject constructor(
             )
             Result.success("Usuario creado correctamente")
         } catch (e: HttpException) {
-            val message = parseError(e)
+            val message = ErrorParser.parseError(e)
             Result.failure(Exception(message))
         } catch (e: Exception) {
             e.printStackTrace()
@@ -74,17 +75,6 @@ class AuthRepositoryImpl @Inject constructor(
             if (id != -1L) tokenManager.saveUserId(id)
         } catch (e: Exception) {
             // Si falla la decodificación, el token igual se guarda
-        }
-    }
-    private fun parseError(e: HttpException): String {
-
-        return try {
-            val errorBody = e.response()?.errorBody()?.string()
-            val json = JSONObject(errorBody ?: "")
-            json.getString("message")
-
-        } catch (ex: Exception) {
-            "Error del servidor"
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.example.reports.application.usecase.reports
 
+import org.example.reports.application.usecase.notifications.CreateNotificationUseCase
 import org.example.reports.application.usecase.users.GetUsersUseCase
 import org.example.reports.domain.model.Photo
 import org.example.reports.domain.model.Report
@@ -21,7 +22,8 @@ class CreateReportUseCase(
     private val authProvider: SpringSecurityUserProvider,
     private val userRepository: UserRepository,
     private val photoRepository: PhotoRepository,
-    private val cloudinaryService: CloudinaryService
+    private val cloudinaryService: CloudinaryService,
+    private val createNotificationUseCase: CreateNotificationUseCase
 ) {
     @Transactional(rollbackFor = [Exception::class])
     fun execute(request: CreateReportRequest, photo: MultipartFile) {
@@ -48,6 +50,15 @@ class CreateReportUseCase(
             user = user
         )
         val savedReport = reportRepository.save(report)
+        val admins = userRepository.findByIsAdminTrue()
+        admins.forEach { admin ->
+            createNotificationUseCase.execute(
+                userId = admin.id,
+                title = "Nuevo reporte creado",
+                message = "Se creó un nuevo reporte: ${savedReport.description}",
+                reportId = savedReport.id
+            )
+        }
         val photo = Photo(
             id = 0,
             url = photoUrl,

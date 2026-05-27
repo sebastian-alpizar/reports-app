@@ -23,15 +23,25 @@ class UserController(
         @RequestBody request: CreateUserRequest
     ): ResponseEntity<ApiResponse<UserResponse>> {
 
-        val saved = createUserUseCase.execute(request)
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                ApiResponse(
-                    message = "Usuario creado exitosamente",
-                    data = mapper.toResponse(saved)
+        return try {
+            val saved = createUserUseCase.execute(request)
+            println(saved)
+            ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                    ApiResponse(
+                        message = "Usuario creado exitosamente",
+                        data = mapper.toResponse(saved)
+                    )
                 )
-            )
+        } catch (e: Exception) {
+            println(e.message)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    ApiResponse(
+                        message = "Error al crear el usuario: ${e.message}"
+                    )
+                )
+        }
     }
 
     @GetMapping("/{id}")

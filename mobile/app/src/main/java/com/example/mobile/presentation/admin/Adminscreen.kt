@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -13,14 +12,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -32,7 +30,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.presentation.components.AppBackground
-import kotlinx.coroutines.launch
+import com.example.mobile.presentation.utils.DateFormatter
 
 // ── COLORES ───────────────────────────────────────────────────────────────────
 private val AccentPurple      = Color(0xFF7C3AED)
@@ -86,9 +84,6 @@ fun AdminScreen(
     viewModel: AdminViewModel = hiltViewModel()
 ) {
     val uiState     by viewModel.uiState.collectAsState()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope       = rememberCoroutineScope()
-
     var searchQuery    by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf<ReportStatus?>(null) }
 
@@ -112,454 +107,314 @@ fun AdminScreen(
     }
 
     AppBackground {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                ModalDrawerSheet(
-                    modifier             = Modifier.width(290.dp),
-                    drawerContainerColor = Color.Transparent,
-                    drawerShape          = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(horizontal = 14.dp, vertical = 14.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(CardBg)
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier          = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.7f))
+
+                    IconButton(
+                        onClick = {
+                            navController.navigate("home") {
+                                launchSingleTop = true
+                                popUpTo("home")
+                            }
+                        }
                     ) {
-                        Spacer(
-                            Modifier
-                                .windowInsetsPadding(WindowInsets.statusBars)
-                                .height(0.dp)
-                        )
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    AccentPurple.copy(alpha = 0.2f)
+                                ),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        Brush.linearGradient(listOf(AccentPurpleLight, AccentPurple))
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text       = "A",
-                                    color      = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize   = 24.sp
-                                )
-                            }
-                            Spacer(Modifier.width(14.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    "Administrador",
-                                    color      = Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize   = 16.sp
-                                )
-                                Spacer(Modifier.height(3.dp))
-                                Text("admin@system.com", color = Color.Black, fontSize = 12.sp)
-                            }
-                        }
 
-                        Spacer(Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 2.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable { scope.launch { drawerState.close() } }
-                                .padding(horizontal = 12.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(
-                                        Brush.horizontalGradient(listOf(AccentPurpleLight, AccentPurple))
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Default.Description,
-                                    contentDescription = null,
-                                    tint     = Color.White,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Spacer(Modifier.width(14.dp))
-                            Text(
-                                "Reportes",
-                                color      = Color.Black,
-                                fontWeight = FontWeight.Medium,
-                                fontSize   = 15.sp
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
-
-                        Spacer(Modifier.weight(1f))
-
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                            color    = Color.White
-                        )
-
-                        Spacer(Modifier.height(4.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 2.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable {
-                                    scope.launch { drawerState.close() }
-                                    navController.navigate("login") {
-                                        popUpTo(0) { inclusive = true }
-                                    }
-                                }
-                                .padding(horizontal = 12.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(Color(0xFFD32F2F), Color(0xFFEF5350))
-                                        )
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.Logout,
-                                    contentDescription = null,
-                                    tint     = Color.White,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Spacer(Modifier.width(14.dp))
-                            Text(
-                                "Cerrar sesión",
-                                color      = Color(0xFFB71C1C),
-                                fontWeight = FontWeight.Medium,
-                                fontSize   = 15.sp
-                            )
-                        }
-
-                        Spacer(Modifier.height(16.dp))
                     }
+
+                    Spacer(Modifier.width(10.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text       = "Panel de Administración",
+                            fontSize   = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color      = Color(0xFF1E1B4B)
+                        )
+                        Text(
+                            text     = "${filteredReports.size} de ${uiState.reports.size} reportes",
+                            fontSize = 11.sp,
+                            color    = Color.Black.copy(alpha = 0.45f)
+                        )
+                    }
+//
+//                    Box(
+//                        modifier = Modifier
+//                            .size(34.dp)
+//                            .clip(RoundedCornerShape(10.dp))
+//                            .background(AccentPurple.copy(alpha = 0.1f)),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        IconButton(
+//                            onClick  = { viewModel.loadAllReports() },
+//                            modifier = Modifier.size(34.dp)
+//                        ) {
+//                            Icon(
+//                                Icons.Default.Refresh,
+//                                contentDescription = "Actualizar",
+//                                tint     = AccentPurple,
+//                                modifier = Modifier.size(17.dp)
+//                            )
+//                        }
+//                    }
                 }
             }
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxSize()) {
 
-                    // ── TOP BAR ──────────────────────────────────
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .windowInsetsPadding(WindowInsets.statusBars)
-                            .padding(horizontal = 14.dp, vertical = 14.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(CardBg)
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
+            // ── CONTENIDO ────────────────────────────────
+            when {
+                uiState.isLoading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = AccentPurpleLight)
+                    }
+                }
+
+                uiState.error != null -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(uiState.error ?: "", color = Color.Black)
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier            = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 14.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding      = PaddingValues(bottom = 24.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier          = Modifier.fillMaxWidth()
-                        ) {
+
+                        // ── BARRA DE BÚSQUEDA ─────────────
+                        item {
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(AccentPurple),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(CardBg)
+                                    .padding(horizontal = 12.dp, vertical = 10.dp)
                             ) {
-                                IconButton(
-                                    onClick  = { scope.launch { drawerState.open() } },
-                                    modifier = Modifier.size(36.dp)
-                                ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        Icons.Default.Menu,
-                                        contentDescription = "Menú",
-                                        tint     = Color.White,
+                                        Icons.Default.Search,
+                                        contentDescription = null,
+                                        tint     = AccentPurple.copy(alpha = 0.6f),
                                         modifier = Modifier.size(18.dp)
                                     )
-                                }
-                            }
-
-                            Spacer(Modifier.width(10.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text       = "Panel de Administración",
-                                    fontSize   = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color      = Color(0xFF1E1B4B)
-                                )
-                                Text(
-                                    text     = "${filteredReports.size} de ${uiState.reports.size} reportes",
-                                    fontSize = 11.sp,
-                                    color    = Color.Black.copy(alpha = 0.45f)
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(AccentPurple.copy(alpha = 0.1f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                IconButton(
-                                    onClick  = { viewModel.loadAllReports() },
-                                    modifier = Modifier.size(34.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Default.Refresh,
-                                        contentDescription = "Actualizar",
-                                        tint     = AccentPurple,
-                                        modifier = Modifier.size(17.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // ── CONTENIDO ────────────────────────────────
-                    when {
-                        uiState.isLoading -> {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(color = AccentPurpleLight)
-                            }
-                        }
-
-                        uiState.error != null -> {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text(uiState.error ?: "", color = Color.Black)
-                            }
-                        }
-
-                        else -> {
-                            LazyColumn(
-                                modifier            = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 14.dp),
-                                verticalArrangement = Arrangement.spacedBy(10.dp),
-                                contentPadding      = PaddingValues(bottom = 24.dp)
-                            ) {
-
-                                // ── BARRA DE BÚSQUEDA ─────────────
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .background(CardBg)
-                                            .padding(horizontal = 12.dp, vertical = 10.dp)
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                Icons.Default.Search,
-                                                contentDescription = null,
-                                                tint     = AccentPurple.copy(alpha = 0.6f),
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                            Spacer(Modifier.width(8.dp))
-                                            BasicTextField(
-                                                value         = searchQuery,
-                                                onValueChange = { searchQuery = it },
-                                                singleLine    = true,
-                                                modifier      = Modifier.weight(1f),
-                                                textStyle     = TextStyle(
-                                                    fontSize = 13.sp,
-                                                    color    = Color.Black.copy(alpha = 0.8f)
-                                                ),
-                                                decorationBox = { inner ->
-                                                    if (searchQuery.isEmpty()) {
-                                                        Text(
-                                                            "Buscar por descripción, usuario, categoría...",
-                                                            fontSize = 13.sp,
-                                                            color    = Color.Black.copy(alpha = 0.35f)
-                                                        )
-                                                    }
-                                                    inner()
-                                                }
-                                            )
-                                            if (searchQuery.isNotEmpty()) {
-                                                IconButton(
-                                                    onClick  = { searchQuery = "" },
-                                                    modifier = Modifier.size(20.dp)
-                                                ) {
-                                                    Icon(
-                                                        Icons.Default.Close,
-                                                        contentDescription = "Limpiar",
-                                                        tint     = Color.Black.copy(alpha = 0.4f),
-                                                        modifier = Modifier.size(16.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // ── CHIPS DE FILTRO ───────────────
-                                item {
-                                    LazyRow(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        contentPadding        = PaddingValues(horizontal = 0.dp)
-                                    ) {
-                                        // Chip "Todos"
-                                        item {
-                                            val isSelected = selectedFilter == null
-                                            Surface(
-                                                onClick = { selectedFilter = null },
-                                                shape   = RoundedCornerShape(50.dp),
-                                                color   = Color.Transparent,
-                                                border  = androidx.compose.foundation.BorderStroke(
-                                                    width = if (isSelected) 1.dp else 0.5.dp,
-                                                    color = if (isSelected) AccentPurple.copy(alpha = 0.8f)
-                                                    else Color.White.copy(alpha = 0.3f)
-                                                )
-                                            ) {
-                                                Row(
-                                                    modifier          = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Text(
-                                                        text       = "Todos",
-                                                        fontSize   = 12.sp,
-                                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                                        color      = if (isSelected) AccentPurple
-                                                        else Color.White.copy(alpha = 0.7f)
-                                                    )
-                                                    if (uiState.reports.isNotEmpty()) {
-                                                        Spacer(Modifier.width(5.dp))
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .clip(RoundedCornerShape(50.dp))
-                                                                .background(
-                                                                    if (isSelected) AccentPurple.copy(alpha = 0.12f)
-                                                                    else Color.White.copy(alpha = 0.12f)
-                                                                )
-                                                                .padding(horizontal = 6.dp, vertical = 1.dp)
-                                                        ) {
-                                                            Text(
-                                                                text      = "${uiState.reports.size}",
-                                                                fontSize  = 10.sp,
-                                                                fontWeight = FontWeight.Medium,
-                                                                color     = if (isSelected) AccentPurple
-                                                                else Color.White.copy(alpha = 0.5f)
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        // Chips por estado
-                                        items(ReportStatus.entries) { statusOption ->
-                                            val isSelected = selectedFilter == statusOption
-                                            val count = uiState.reports.count {
-                                                ReportStatus.from(it.status) == statusOption
-                                            }
-                                            Surface(
-                                                onClick = {
-                                                    selectedFilter = if (isSelected) null else statusOption
-                                                },
-                                                shape  = RoundedCornerShape(50.dp),
-                                                color  = Color.Transparent,
-                                                border = androidx.compose.foundation.BorderStroke(
-                                                    width = if (isSelected) 1.dp else 0.5.dp,
-                                                    color = if (isSelected) statusOption.bgColor.copy(alpha = 0.8f)
-                                                    else Color.White.copy(alpha = 0.3f)
-                                                )
-                                            ) {
-                                                Row(
-                                                    modifier          = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .size(7.dp)
-                                                            .clip(CircleShape)
-                                                            .background(statusOption.dot)
-                                                    )
-                                                    Spacer(Modifier.width(6.dp))
-                                                    Text(
-                                                        text       = statusOption.label,
-                                                        fontSize   = 12.sp,
-                                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                                        color      = if (isSelected) statusOption.dot
-                                                        else Color.White.copy(alpha = 0.7f)
-                                                    )
-                                                    if (count > 0) {
-                                                        Spacer(Modifier.width(5.dp))
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .clip(RoundedCornerShape(50.dp))
-                                                                .background(
-                                                                    if (isSelected) statusOption.bgColor.copy(alpha = 0.15f)
-                                                                    else Color.White.copy(alpha = 0.12f)
-                                                                )
-                                                                .padding(horizontal = 6.dp, vertical = 1.dp)
-                                                        ) {
-                                                            Text(
-                                                                text       = "$count",
-                                                                fontSize   = 10.sp,
-                                                                fontWeight = FontWeight.Medium,
-                                                                color      = if (isSelected) statusOption.dot
-                                                                else Color.White.copy(alpha = 0.5f)
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // ── LISTA VACÍA ───────────────────
-                                if (filteredReports.isEmpty()) {
-                                    item {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 48.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                                Icon(
-                                                    Icons.Default.SearchOff,
-                                                    contentDescription = null,
-                                                    tint     = Color.White.copy(alpha = 0.25f),
-                                                    modifier = Modifier.size(40.dp)
-                                                )
-                                                Spacer(Modifier.height(10.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    BasicTextField(
+                                        value         = searchQuery,
+                                        onValueChange = { searchQuery = it },
+                                        singleLine    = true,
+                                        modifier      = Modifier.weight(1f),
+                                        textStyle     = TextStyle(
+                                            fontSize = 13.sp,
+                                            color    = Color.Black.copy(alpha = 0.8f)
+                                        ),
+                                        decorationBox = { inner ->
+                                            if (searchQuery.isEmpty()) {
                                                 Text(
-                                                    text     = "Sin resultados",
-                                                    fontSize = 14.sp,
-                                                    color    = Color.White.copy(alpha = 0.4f)
+                                                    "Buscar por descripción, usuario",
+                                                    fontSize = 13.sp,
+                                                    color    = Color.Black.copy(alpha = 0.35f)
                                                 )
+                                            }
+                                            inner()
+                                        }
+                                    )
+                                    if (searchQuery.isNotEmpty()) {
+                                        IconButton(
+                                            onClick  = { searchQuery = "" },
+                                            modifier = Modifier.size(20.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Close,
+                                                contentDescription = "Limpiar",
+                                                tint     = Color.Black.copy(alpha = 0.4f),
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // ── CHIPS DE FILTRO ───────────────
+                        item {
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                contentPadding        = PaddingValues(horizontal = 0.dp)
+                            ) {
+                                // Chip "Todos"
+                                item {
+                                    val isSelected = selectedFilter == null
+                                    Surface(
+                                        onClick = { selectedFilter = null },
+                                        shape   = RoundedCornerShape(50.dp),
+                                        color   = Color.Transparent,
+                                        border  = androidx.compose.foundation.BorderStroke(
+                                            width = if (isSelected) 1.dp else 0.5.dp,
+                                            color = if (isSelected) AccentPurple.copy(alpha = 0.8f)
+                                            else Color.White.copy(alpha = 0.3f)
+                                        )
+                                    ) {
+                                        Row(
+                                            modifier          = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text       = "Todos",
+                                                fontSize   = 12.sp,
+                                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                                color      = if (isSelected) AccentPurple
+                                                else Color.White.copy(alpha = 0.7f)
+                                            )
+                                            if (uiState.reports.isNotEmpty()) {
+                                                Spacer(Modifier.width(5.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(50.dp))
+                                                        .background(
+                                                            if (isSelected) AccentPurple.copy(alpha = 0.12f)
+                                                            else Color.White.copy(alpha = 0.12f)
+                                                        )
+                                                        .padding(horizontal = 6.dp, vertical = 1.dp)
+                                                ) {
+                                                    Text(
+                                                        text      = "${uiState.reports.size}",
+                                                        fontSize  = 10.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color     = if (isSelected) AccentPurple
+                                                        else Color.White.copy(alpha = 0.5f)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
-                                } else {
-                                    items(filteredReports) { report ->
-                                        AdminReportCard(
-                                            report         = report,
-                                            isLoading      = uiState.updatingId == report.id,
-                                            onStatusChange = { status -> viewModel.updateStatus(report.id, status) },
-                                            onDelete       = { viewModel.deleteReport(report.id) }
+                                }
+
+                                // Chips por estado
+                                items(ReportStatus.entries) { statusOption ->
+                                    val isSelected = selectedFilter == statusOption
+                                    val count = uiState.reports.count {
+                                        ReportStatus.from(it.status) == statusOption
+                                    }
+                                    Surface(
+                                        onClick = {
+                                            selectedFilter = if (isSelected) null else statusOption
+                                        },
+                                        shape  = RoundedCornerShape(50.dp),
+                                        color  = Color.Transparent,
+                                        border = androidx.compose.foundation.BorderStroke(
+                                            width = if (isSelected) 1.dp else 0.5.dp,
+                                            color = if (isSelected) statusOption.bgColor.copy(alpha = 0.8f)
+                                            else Color.White.copy(alpha = 0.3f)
+                                        )
+                                    ) {
+                                        Row(
+                                            modifier          = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(7.dp)
+                                                    .clip(CircleShape)
+                                                    .background(statusOption.dot)
+                                            )
+                                            Spacer(Modifier.width(6.dp))
+                                            Text(
+                                                text       = statusOption.label,
+                                                fontSize   = 12.sp,
+                                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                                color      = if (isSelected) statusOption.dot
+                                                else Color.White.copy(alpha = 0.7f)
+                                            )
+                                            if (count > 0) {
+                                                Spacer(Modifier.width(5.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(50.dp))
+                                                        .background(
+                                                            if (isSelected) statusOption.bgColor.copy(alpha = 0.15f)
+                                                            else Color.White.copy(alpha = 0.12f)
+                                                        )
+                                                        .padding(horizontal = 6.dp, vertical = 1.dp)
+                                                ) {
+                                                    Text(
+                                                        text       = "$count",
+                                                        fontSize   = 10.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color      = if (isSelected) statusOption.dot
+                                                        else Color.White.copy(alpha = 0.5f)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // ── LISTA VACÍA ───────────────────
+                        if (filteredReports.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 48.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                            Icons.Default.SearchOff,
+                                            contentDescription = null,
+                                            tint     = Color.White.copy(alpha = 0.25f),
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                        Spacer(Modifier.height(10.dp))
+                                        Text(
+                                            text     = "Sin resultados",
+                                            fontSize = 14.sp,
+                                            color    = Color.White.copy(alpha = 0.4f)
                                         )
                                     }
                                 }
+                            }
+                        } else {
+                            items(filteredReports) { report ->
+                                AdminReportCard(
+                                    report         = report,
+                                    isLoading      = uiState.updatingId == report.id,
+                                    onStatusChange = { status -> viewModel.updateStatus(report.id, status) },
+                                    onDelete       = { viewModel.deleteReport(report.id) }
+                                )
                             }
                         }
                     }
@@ -735,7 +590,7 @@ fun AdminReportCard(
                     )
                     Spacer(Modifier.width(3.dp))
                     Text(
-                        text     = report.reportDate.toString(),
+                        text     = DateFormatter.formatDate(report.reportDate),
                         fontSize = 11.sp,
                         color    = Color.Black.copy(alpha = 0.42f)
                     )
@@ -818,7 +673,7 @@ fun AdminReportCard(
                         DetailRow(Icons.Default.MyLocation, "Coordenadas", "${report.latitude}, ${report.longitude}")
                     }
                     report.category?.let { DetailRow(Icons.Default.Category, "Categoría", it) }
-                    DetailRow(Icons.Default.Tag, "ID", "#${report.id}")
+                    // DetailRow(Icons.Default.Tag, "ID", "#${report.id}")
                 }
             }
 

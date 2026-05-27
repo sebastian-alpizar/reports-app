@@ -1,4 +1,20 @@
 services:
+  mongo:
+    image: mongo:8
+
+    container_name: reports-mongo
+
+    restart: always
+
+    ports:
+      - "27017:27017"
+
+    environment:
+      MONGO_INITDB_DATABASE: reportsdb
+
+    volumes:
+      - mongo_data:/data/db
+
   postgres:
     image: postgres:16
 
@@ -26,6 +42,7 @@ services:
 
     depends_on:
       - postgres
+      - mongo
 
     ports:
       - "8080:8080"
@@ -35,6 +52,8 @@ services:
       DB_USERNAME: reportsuser
       DB_PASSWORD: reportspass
 
+      MONGO_URI: mongodb://mongo:27017/reportsdb
+
       JWT_SECRET: jwt.secret=mi_clave_super_secreta_de_256_bits_minimo_para_jwt_2026
 
       CLOUDINARY_CLOUD_NAME: dmz2knvds
@@ -43,3 +62,4 @@ services:
 
 volumes:
   postgres_data:
+  mongo_data:

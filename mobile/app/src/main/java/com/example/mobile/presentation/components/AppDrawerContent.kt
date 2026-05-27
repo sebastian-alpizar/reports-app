@@ -1,5 +1,6 @@
 package com.example.mobile.presentation.components
 
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.HorizontalDivider
@@ -35,7 +37,10 @@ fun AppDrawerContent(
     userEmail: String,
     onHistorial: () -> Unit,
     onPerfil: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNotifications: () -> Unit,
+    onAdmin: () -> Unit,
+    isAdmin: Boolean
 ) {
     ModalDrawerSheet(
         modifier = Modifier.width(290.dp),
@@ -108,6 +113,20 @@ fun AppDrawerContent(
                 label = "Historial",
                 onClick = onHistorial
             )
+
+            DrawerItem(
+                icon = Icons.Default.Notifications,
+                label = "Notificaciones",
+                onClick = onNotifications
+            )
+
+            if (isAdmin){
+                DrawerItem(
+                    icon = Icons.Default.Description,
+                    label = "Administrador",
+                    onClick = onAdmin
+                )
+            }
 
             DrawerItem(
                 icon = Icons.Default.Person,

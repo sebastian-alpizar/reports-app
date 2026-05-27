@@ -83,6 +83,7 @@ fun HomeScreen(
             AppDrawerContent (
                 userName  = uiState.userName,
                 userEmail = uiState.userEmail,
+                isAdmin = uiState.isAdmin,
                 onHistorial = {
                     scope.launch { drawerState.close()
                     }
@@ -92,10 +93,23 @@ fun HomeScreen(
                     scope.launch { drawerState.close() }
                     navController.navigate("profile")
                 },
-            ) {
-                scope.launch { drawerState.close() }
-                viewModel.logout()
-            }
+                onLogout = {
+                    scope.launch { drawerState.close() }
+                    viewModel.logout()
+                },
+                onNotifications = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate("notifications")
+                },
+                onAdmin = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate("admin")
+                },
+            )
+//            {
+//                scope.launch { drawerState.close() }
+//                viewModel.logout()
+//            }
         }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
