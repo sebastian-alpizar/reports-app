@@ -17,6 +17,14 @@ interface ReportApi {
         @Part photo: MultipartBody.Part
     )
 
+    @Multipart
+    @PUT("reports/{id}")
+    suspend fun updateReport(
+        @Path("id") id: Long,
+        @Part("report") report: RequestBody,
+        @Part photo: MultipartBody.Part?
+    )
+
     @GET("reports")
     suspend fun getAllReports(): List<ReportResponse>
 

@@ -176,30 +176,34 @@ fun HomeScreen(
                                     .padding(start = 16.dp, bottom = 12.dp)
                             )
 
+                            // Detalle con imagen y botón editar
                             ReportDetailCard(
-                                report    = uiState.selectedReport,
-                                onDismiss = { viewModel.onDismissReportDetail() },
-                                modifier  = Modifier
+                                report        = uiState.selectedReport,
+                                currentUserId = viewModel.currentUserId,
+                                onDismiss     = { viewModel.onDismissReportDetail() },
+                                onEditClicked = { report -> viewModel.onEditReport(report) },
+                                onDeleteClicked = { report -> viewModel.onDeleteReport(report) },
+                                modifier      = Modifier
                                     .align(Alignment.Center)
                                     .padding(bottom = 16.dp)
                             )
 
                             if (uiState.showReportModal && uiState.currentLocation != null) {
                                 ReportModal(
-                                    currentLocation = uiState.currentLocation,
-                                    isSubmitting = reportFormState.isSubmitting,
-                                    snackbarState = snackbarState,
-                                    reportFormState = reportFormState,
+                                    currentLocation     = uiState.currentLocation,
+                                    isSubmitting        = reportFormState.isSubmitting,
+                                    snackbarState       = snackbarState,
+                                    reportFormState     = reportFormState,
                                     onDescriptionChange = viewModel::updateReportDescription,
-                                    onImageSelected = viewModel::updateSelectedImage,
-                                    onSubmit = { viewModel.sendReport(context) },
-                                    onDismiss = { viewModel.toggleReportModal(false) }
+                                    onImageSelected     = viewModel::updateSelectedImage,
+                                    onSubmit            = { viewModel.sendReport(context) },
+                                    onDismiss           = { viewModel.toggleReportModal(false) }
                                 )
                             } else {
                                 AppSnackbar(
-                                    message = snackbarState.message,
-                                    isError = snackbarState.isError,
-                                    visible = snackbarState.isVisible,
+                                    message   = snackbarState.message,
+                                    isError   = snackbarState.isError,
+                                    visible   = snackbarState.isVisible,
                                     onDismiss = { scope.launch { snackbarState.dismiss() } }
                                 )
                             }
@@ -214,7 +218,7 @@ fun HomeScreen(
                                 Spacer(Modifier.height(16.dp))
                                 Button(
                                     onClick = { locationPermissionState.launchPermissionRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)
+                                    colors  = ButtonDefaults.buttonColors(containerColor = AccentPurple)
                                 ) {
                                     Text("Conceder permiso", color = Color.White)
                                 }

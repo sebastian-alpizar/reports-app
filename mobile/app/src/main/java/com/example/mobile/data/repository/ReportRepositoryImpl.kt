@@ -54,6 +54,31 @@ class ReportRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateReport(
+        context: Context,
+        reportId: String,
+        description: String,
+        imageUri: String?
+    ): Result<Unit> {
+        return try {
+            val reportJson = Gson().toJson(mapOf("description" to description))
+            val reportBody = reportJson.toRequestBody("application/json".toMediaTypeOrNull())
+
+            val photoPart: MultipartBody.Part? = imageUri?.let { uri ->
+                val file = File.createTempFile("upload", ".jpg", context.cacheDir)
+                context.contentResolver.openInputStream(Uri.parse(uri))
+                    ?.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
+                file.asRequestBody("image/*".toMediaTypeOrNull())
+                    .let { MultipartBody.Part.createFormData("photo", file.name, it) }
+            }
+
+            reportApi.updateReport(reportId.toLong(), reportBody, photoPart)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getAllReports(): Result<List<ReportResponse>> {
         return try {
             Result.success(reportApi.getAllReports())
@@ -85,12 +110,24 @@ class ReportRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteReport(reportId: String): Result<Unit> {
+        return try {
+            reportApi.deleteReport(reportId.toLong())
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     private fun ReportResponse.toDomain() = Report(
         id                  = this.id.toString(),
         location            = Location(latitude = this.latitude, longitude = this.longitude),
         description         = this.description,
         approximateLocation = this.approximateLocation,
         category            = this.category,
-        status              = this.status
+        status              = this.status,
+        photoUrl            = this.photoUrl,
+        userId              = this.userId,
+        userName            = this.userName
     )
 }

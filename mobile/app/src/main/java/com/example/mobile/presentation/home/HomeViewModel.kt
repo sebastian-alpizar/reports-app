@@ -11,8 +11,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
+import com.example.mobile.domain.usecase.DeleteReportUseCase
 import com.example.mobile.domain.usecase.GetNearbyReportsUseCase
 import com.example.mobile.domain.usecase.SendReportUseCase
+import com.example.mobile.domain.usecase.UpdateReportUseCase
 import com.example.mobile.domain.usecase.location.GetLocationUpdatesUseCase
 import com.example.mobile.domain.usecase.location.HasLocationPermissionUseCase
 import com.example.mobile.presentation.utils.UiEvent
@@ -30,7 +32,8 @@ data class HomeUiState(
     val userEmail: String = "",
     val nearbyReports: List<Report> = emptyList(),
     val isLoadingReports: Boolean = false,
-    val selectedReport: Report? = null
+    val selectedReport: Report? = null,
+    val editingReport: Report? = null
 )
 
 data class ReportFormState(
@@ -46,6 +49,8 @@ class HomeViewModel @Inject constructor(
     private val getLocationUpdatesUseCase: GetLocationUpdatesUseCase,
     private val hasLocationPermissionUseCase: HasLocationPermissionUseCase,
     private val sendReportUseCase: SendReportUseCase,
+    private val updateReportUseCase: UpdateReportUseCase,
+    private val deleteReportUseCase: DeleteReportUseCase,
     private val getNearbyReportsUseCase: GetNearbyReportsUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
@@ -62,6 +67,8 @@ class HomeViewModel @Inject constructor(
     var shouldCenterMap by mutableStateOf(false)
         private set
 
+    val currentUserId: Long? get() = tokenManager.getUserId()
+
     fun centerOnCurrentLocation() { shouldCenterMap = true }
     fun onMapCentered() { shouldCenterMap = false }
 
@@ -75,11 +82,8 @@ class HomeViewModel @Inject constructor(
 
     private fun checkPermissionAndStartUpdates() {
         viewModelScope.launch {
-            if (hasLocationPermissionUseCase()) {
-                startLocationUpdates()
-            } else {
-                uiState = uiState.copy(shouldRequestPermission = true, isLoading = false)
-            }
+            if (hasLocationPermissionUseCase()) startLocationUpdates()
+            else uiState = uiState.copy(shouldRequestPermission = true, isLoading = false)
         }
     }
 
@@ -120,9 +124,27 @@ class HomeViewModel @Inject constructor(
         uiState = uiState.copy(selectedReport = report)
     }
 
-
     fun onDismissReportDetail() {
         uiState = uiState.copy(selectedReport = null)
+    }
+
+    fun onEditReport(report: Report) {
+        reportFormState = ReportFormState(description = report.description)
+        uiState = uiState.copy(editingReport = report, showReportModal = true)
+    }
+
+    fun onDeleteReport(report: Report) {
+        viewModelScope.launch {
+            deleteReportUseCase(report.id)
+                .onSuccess {
+                    uiState = uiState.copy(selectedReport = null)
+                    _event.emit(UiEvent.ShowSnackbar("Reporte eliminado", false))
+                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
+                }
+                .onFailure { error ->
+                    _event.emit(UiEvent.ShowSnackbar("Error al eliminar: ${error.message}", true))
+                }
+        }
     }
 
     fun toggleReportModal(show: Boolean) {
@@ -130,18 +152,61 @@ class HomeViewModel @Inject constructor(
         uiState = uiState.copy(showReportModal = show)
     }
 
+
+//    fun sendReport(context: Context) {
+//        if (!validateReportForm()) return
+//        val currentLocation = uiState.currentLocation ?: run {
+//            viewModelScope.launch { _event.emit(UiEvent.ShowSnackbar("No se ha obtenido la ubicación aún", true)) }
+//            return
+//        }
+//        viewModelScope.launch {
+//            reportFormState = reportFormState.copy(isSubmitting = true)
+//            val report = Report(
+//                location = currentLocation,
+//                description = reportFormState.description,
+//                imageUri = reportFormState.selectedImageUri
+//            )
+//            val result = sendReportUseCase(context, report)
+//            reportFormState = reportFormState.copy(isSubmitting = false)
+//            result.fold(
+//                onSuccess = {
+//                    _event.emit(UiEvent.ShowSnackbar("Reporte enviado exitosamente", false))
+//                    toggleReportModal(false)
+//                    uiState.currentLocation?.let {
+//                        loadNearbyReports(it.latitude, it.longitude)
+//                    }
+//                },
+//                onFailure = { error ->
+//                    _event.emit(UiEvent.ShowSnackbar("Error al enviar reporte: ${error.message}", true))
+//                }
+//            )
+//        }
+//    }
+
+
     fun sendReport(context: Context) {
+        val editing = uiState.editingReport
+        if (editing != null) {
+            updateExistingReport(context, editing)
+        } else {
+            createNewReport(context)
+        }
+    }
+
+    private fun createNewReport(context: Context) {
         if (!validateReportForm()) return
         val currentLocation = uiState.currentLocation ?: run {
-            viewModelScope.launch { _event.emit(UiEvent.ShowSnackbar("No se ha obtenido la ubicación aún", true)) }
+            viewModelScope.launch {
+                _event.emit(UiEvent.ShowSnackbar("No se ha obtenido la ubicación aún", true))
+            }
             return
         }
         viewModelScope.launch {
             reportFormState = reportFormState.copy(isSubmitting = true)
             val report = Report(
-                location = currentLocation,
+                location    = currentLocation,
                 description = reportFormState.description,
-                imageUri = reportFormState.selectedImageUri
+                imageUri    = reportFormState.selectedImageUri
             )
             val result = sendReportUseCase(context, report)
             reportFormState = reportFormState.copy(isSubmitting = false)
@@ -149,12 +214,39 @@ class HomeViewModel @Inject constructor(
                 onSuccess = {
                     _event.emit(UiEvent.ShowSnackbar("Reporte enviado exitosamente", false))
                     toggleReportModal(false)
-                    uiState.currentLocation?.let {
-                        loadNearbyReports(it.latitude, it.longitude)
-                    }
+                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
                 },
                 onFailure = { error ->
                     _event.emit(UiEvent.ShowSnackbar("Error al enviar reporte: ${error.message}", true))
+                }
+            )
+        }
+    }
+
+    private fun updateExistingReport(context: Context, report: Report) {
+        if (reportFormState.description.isBlank()) {
+            viewModelScope.launch {
+                _event.emit(UiEvent.ShowSnackbar("La descripción no puede estar vacía", true))
+            }
+            return
+        }
+        viewModelScope.launch {
+            reportFormState = reportFormState.copy(isSubmitting = true)
+            val result = updateReportUseCase(
+                context     = context,
+                reportId    = report.id,
+                description = reportFormState.description,
+                imageUri    = reportFormState.selectedImageUri
+            )
+            reportFormState = reportFormState.copy(isSubmitting = false)
+            result.fold(
+                onSuccess = {
+                    _event.emit(UiEvent.ShowSnackbar("Reporte actualizado exitosamente", false))
+                    toggleReportModal(false)
+                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
+                },
+                onFailure = { error ->
+                    _event.emit(UiEvent.ShowSnackbar("Error al actualizar: ${error.message}", true))
                 }
             )
         }
