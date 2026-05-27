@@ -4,6 +4,7 @@ import com.example.mobile.data.remote.api.AuthApi
 import com.example.mobile.core.network.AuthInterceptor
 import com.example.mobile.data.remote.api.NotificationApi
 import com.example.mobile.data.remote.api.ReportApi
+import com.example.mobile.data.remote.api.UserApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,10 +20,10 @@ import javax.inject.Singleton
 object NetworkModule {
 
     // Para local
-    //private const val BASE_URL = "http://10.0.2.2:8080/api/"
+    private const val BASE_URL = "http://10.0.2.2:8080/api/"
 
     // Para hosting
-    private const val BASE_URL = "https://reports-app-how0.onrender.com/api/"
+    //private const val BASE_URL = "https://reports-app-how0.onrender.com/api/"
 
     @Provides
     @Singleton
@@ -58,6 +59,14 @@ object NetworkModule {
         retrofit: Retrofit
     ): AuthApi {
         return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApi(
+        retrofit: Retrofit
+    ): UserApi {
+        return retrofit.create(UserApi::class.java)
     }
 
     @Provides
