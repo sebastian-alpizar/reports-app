@@ -281,7 +281,7 @@ fun ReportModal(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
+                                .height(400.dp)
                                 .padding(bottom = 16.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(Color(0xFF2C2B2E))

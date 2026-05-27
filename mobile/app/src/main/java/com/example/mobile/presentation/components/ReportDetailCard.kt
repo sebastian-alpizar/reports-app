@@ -45,12 +45,12 @@ fun ReportDetailCard(
 
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(report) {
-        if (report != null) {
-            delay(8000)
-            onDismiss()
-        }
-    }
+//    LaunchedEffect(report) {
+//        if (report != null) {
+//            delay(8000)
+//            onDismiss()
+//        }
+//    }
 
     if (showDeleteDialog && report != null) {
         AlertDialog(
@@ -173,7 +173,7 @@ fun ReportDetailCard(
                         contentScale       = ContentScale.Crop,
                         modifier           = Modifier
                             .fillMaxWidth()
-                            .height(160.dp)
+                            .height(400.dp)
                             .clip(RoundedCornerShape(12.dp))
                     )
                     Spacer(modifier = Modifier.height(10.dp))
