@@ -32,19 +32,14 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun loadReports() {
-
         viewModelScope.launch {
-
-            _uiState.value = _uiState.value.copy(
-                isLoading = true,
-                error = null
-            )
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             try {
-
                 val userId = tokenManager.getUserId()
+                android.util.Log.d("HistoryVM", "userId: $userId")
 
-                if (userId == -1L) {
+                if (userId == null) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = "No se encontró el usuario logueado"
@@ -53,14 +48,12 @@ class HistoryViewModel @Inject constructor(
                 }
 
                 val reports = reportApi.getReportsByUser(userId)
+                android.util.Log.d("HistoryVM", "reportes: ${reports.size}")
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    reports = reports
-                )
+                _uiState.value = _uiState.value.copy(isLoading = false, reports = reports)
 
             } catch (e: Exception) {
-
+                android.util.Log.e("HistoryVM", "Error: ${e.message}", e)
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Error desconocido"

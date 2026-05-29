@@ -41,4 +41,12 @@ class UserRepositoryImpl(
         return jpaRepository.findByIsAdminTrue()
             .map { mapper.toDomain(it) }
     }
+
+    override fun existsByEmailAndIdNot(email: String, id: Long): Boolean {
+        return jpaRepository.existsByEmailAndIdNot(email, id)
+    }
+
+    override fun existsByNationalIdAndIdNot(nationalId: String, id: Long): Boolean {
+        return jpaRepository.existsByNationalIdAndIdNot(nationalId, id)
+    }
 }

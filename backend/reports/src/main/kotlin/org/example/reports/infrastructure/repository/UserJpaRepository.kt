@@ -9,4 +9,7 @@ interface UserJpaRepository : JpaRepository<UserEntity, Long> {
     fun existsByEmail(email: String): Boolean
     fun existsByNationalId(id: String): Boolean
     fun findByIsAdminTrue(): List<UserEntity>
+
+    fun existsByEmailAndIdNot(email: String, id: Long): Boolean
+    fun existsByNationalIdAndIdNot(nationalId: String, id: Long): Boolean
 }
