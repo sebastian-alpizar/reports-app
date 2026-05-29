@@ -6,6 +6,7 @@ import com.example.mobile.data.remote.api.ReportApi
 import com.example.mobile.data.remote.dto.ReportRequest
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.data.remote.dto.UpdateStatusRequest
+import com.example.mobile.data.remote.util.ErrorParser
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
 import com.example.mobile.domain.model.ReportStatus
@@ -15,6 +16,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import java.io.File
 import javax.inject.Inject
 
@@ -49,7 +51,11 @@ class ReportRepositoryImpl @Inject constructor(
             reportApi.sendReport(report = reportBody, photo = photoPart)
             Result.success(Unit)
 
+        } catch (e: HttpException) {
+            val message = ErrorParser.parseError(e)
+            Result.failure(Exception(message))
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -74,7 +80,11 @@ class ReportRepositoryImpl @Inject constructor(
 
             reportApi.updateReport(reportId.toLong(), reportBody, photoPart)
             Result.success(Unit)
+        } catch (e: HttpException) {
+            val message = ErrorParser.parseError(e)
+            Result.failure(Exception(message))
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }

@@ -46,6 +46,9 @@ dependencies {
 
     // Para Mongo
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+    // IA Gemini
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 kapt {

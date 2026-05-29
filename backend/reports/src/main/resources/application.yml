@@ -9,6 +9,9 @@ spring:
 
   mongodb:
     uri: ${MONGO_URI}
+#  data:
+#    mongodb:
+#      uri: ${MONGO_URI}
 
   servlet:
     multipart:
@@ -36,3 +39,6 @@ cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME:dmz2knvds}
   api-key: ${CLOUDINARY_API_KEY:744686633472466}
   api-secret: ${CLOUDINARY_API_SECRET:wK190p44-qOla-U-QpN2o1XzI7Q}
+
+gemini:
+  api-key: ${GEMINI_API_KEY}
