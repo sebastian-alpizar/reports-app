@@ -1,13 +1,13 @@
 package org.example.reports.application.usecase.reports
 
 import org.example.reports.application.usecase.notifications.CreateNotificationUseCase
-import org.example.reports.application.usecase.users.GetUsersUseCase
 import org.example.reports.domain.model.Photo
 import org.example.reports.domain.model.Report
 import org.example.reports.domain.model.ReportStatus
 import org.example.reports.domain.repository.PhotoRepository
 import org.example.reports.domain.repository.ReportRepository
 import org.example.reports.domain.repository.UserRepository
+import org.example.reports.infrastructure.ai.GeminiService
 import org.example.reports.infrastructure.cloudinary.CloudinaryService
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.springframework.stereotype.Service
@@ -23,7 +23,8 @@ class CreateReportUseCase(
     private val userRepository: UserRepository,
     private val photoRepository: PhotoRepository,
     private val cloudinaryService: CloudinaryService,
-    private val createNotificationUseCase: CreateNotificationUseCase
+    private val createNotificationUseCase: CreateNotificationUseCase,
+    private val geminiService: GeminiService
 ) {
     @Transactional(rollbackFor = [Exception::class])
     fun execute(request: CreateReportRequest, photo: MultipartFile) {
@@ -31,6 +32,12 @@ class CreateReportUseCase(
 
         val user = userRepository.findByEmail(email)
             ?: throw RuntimeException("Usuario no encontrado")
+
+//        val validImage = geminiService.validateImage(photo)
+//
+//        if (!validImage) {
+//            throw RuntimeException("La imagen no es apta para la plataforma")
+//        }
 
         val photoUrl = try {
             cloudinaryService.uploadPhoto(photo)

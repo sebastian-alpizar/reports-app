@@ -44,7 +44,7 @@ class ReportController(
                 .body(ApiResponse(message = "Reporte creado exitosamente"))
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse(message = "Error al crear el reporte: ${e.message}"))
+                .body(ApiResponse(message = e.message ?: "Error al validar la foto"))
         }
     }
 
