@@ -76,6 +76,12 @@ fun HomeScreen(
         else if (!locationPermissionState.status.shouldShowRationale) viewModel.onPermissionDenied()
     }
 
+    LaunchedEffect(uiState.currentLocation) {
+        if (uiState.currentLocation != null && uiState.currentAddress == null) {
+            viewModel.loadCurrentAddress(context)
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen,
@@ -205,6 +211,7 @@ fun HomeScreen(
                             if (uiState.showReportModal && uiState.currentLocation != null) {
                                 ReportModal(
                                     currentLocation     = uiState.currentLocation,
+                                    currentAddress      = uiState.currentAddress,
                                     isSubmitting        = reportFormState.isSubmitting,
                                     snackbarState       = snackbarState,
                                     reportFormState     = reportFormState,
