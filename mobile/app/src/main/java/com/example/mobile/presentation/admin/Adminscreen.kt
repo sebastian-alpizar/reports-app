@@ -31,7 +31,6 @@ import coil.compose.AsyncImage
 import com.example.mobile.domain.model.PriorityLevel
 import com.example.mobile.domain.model.Report
 import com.example.mobile.presentation.components.AppBackground
-import com.example.mobile.presentation.home.HomeViewModel
 import com.example.mobile.presentation.utils.DateFormatter
 
 // ── COLORES ───────────────────────────────────────────────────────────────────
@@ -52,7 +51,7 @@ private enum class ReportStatus(
         apiValue  = "PENDING",
         label     = "Pendiente",
         desc      = "Sin atender aún",
-        dot       = Color(0xFFAB8BF5),   // lila claro
+        dot       = Color(0xFFAB8BF5),
         bgColor   = Color(0xFFAB8BF5),
         textColor = Color(0xFF5B21B6)
     ),
@@ -60,7 +59,7 @@ private enum class ReportStatus(
         apiValue  = "REJECTED",
         label     = "En proceso",
         desc      = "Se está atendiendo",
-        dot       = Color(0xFF7C3AED),   // morado medio
+        dot       = Color(0xFF7C3AED),
         bgColor   = Color(0xFF7C3AED),
         textColor = Color(0xFF3B0764)
     ),
@@ -68,7 +67,7 @@ private enum class ReportStatus(
         apiValue  = "APPROVED",
         label     = "Resuelto",
         desc      = "Caso cerrado",
-        dot       = Color(0xFF4C1D95),   // morado oscuro
+        dot       = Color(0xFF4C1D95),
         bgColor   = Color(0xFF4C1D95),
         textColor = Color(0xFFEDE9FE)
     );
@@ -78,6 +77,7 @@ private enum class ReportStatus(
             entries.firstOrNull { it.apiValue.equals(value, ignoreCase = true) } ?: PENDING
     }
 }
+
 // ── PANTALLA PRINCIPAL ────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +85,7 @@ fun AdminScreen(
     navController: NavController,
     viewModel: AdminViewModel = hiltViewModel(),
 ) {
-    val uiState     by viewModel.uiState.collectAsState()
+    val uiState        by viewModel.uiState.collectAsState()
     var searchQuery    by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf<ReportStatus?>(null) }
 
@@ -191,7 +191,7 @@ fun AdminScreen(
                 }
             }
 
-            // ── CONTENIDO ────────────────────────────────
+            // ── CONTENIDO ─────────────────────────────────
             when {
                 uiState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

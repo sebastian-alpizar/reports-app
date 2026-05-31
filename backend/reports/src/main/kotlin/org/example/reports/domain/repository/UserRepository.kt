@@ -9,4 +9,6 @@ interface UserRepository {
     fun existsByEmail(email: String): Boolean
     fun existsByNationalId(id: String): Boolean
     fun findByIsAdminTrue(): List<User>
+    fun existsByEmailAndIdNot(email: String, id: Long): Boolean
+    fun existsByNationalIdAndIdNot(nationalId: String, id: Long): Boolean
 }

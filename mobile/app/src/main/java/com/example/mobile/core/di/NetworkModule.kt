@@ -4,6 +4,7 @@ import com.example.mobile.data.remote.api.AuthApi
 import com.example.mobile.core.network.AuthInterceptor
 import com.example.mobile.data.remote.api.NotificationApi
 import com.example.mobile.data.remote.api.ReportApi
+import com.example.mobile.data.remote.api.UserApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,6 +63,14 @@ object NetworkModule {
         retrofit: Retrofit
     ): AuthApi {
         return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApi(
+        retrofit: Retrofit
+    ): UserApi {
+        return retrofit.create(UserApi::class.java)
     }
 
     @Provides

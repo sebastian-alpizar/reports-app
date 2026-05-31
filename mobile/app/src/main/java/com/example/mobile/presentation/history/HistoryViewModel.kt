@@ -32,7 +32,6 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun loadReports() {
-
         viewModelScope.launch {
 
             _uiState.value = _uiState.value.copy(
@@ -41,7 +40,6 @@ class HistoryViewModel @Inject constructor(
             )
 
             try {
-
                 val userId = tokenManager.getUserId()
 
                 if (userId == -1L || userId == null) {
