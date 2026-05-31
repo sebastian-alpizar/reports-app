@@ -32,5 +32,7 @@ data class ReportEntity(
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    val user: UserEntity
+    val user: UserEntity,
+
+    val severity: Int = 1,
 )

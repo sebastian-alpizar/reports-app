@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.domain.model.PriorityLevel
+import com.example.mobile.domain.model.Report
 import com.example.mobile.presentation.components.AppBackground
 import com.example.mobile.presentation.utils.DateFormatter
 
@@ -82,7 +83,7 @@ private enum class ReportStatus(
 @Composable
 fun AdminScreen(
     navController: NavController,
-    viewModel: AdminViewModel = hiltViewModel()
+    viewModel: AdminViewModel = hiltViewModel(),
 ) {
     val uiState        by viewModel.uiState.collectAsState()
     var searchQuery    by remember { mutableStateOf("") }
@@ -108,9 +109,9 @@ fun AdminScreen(
     }
 
     AppBackground {
-        Column(modifier = Modifier.fillMaxSize()) {
-
-            // ── TOP BAR ───────────────────────────────────
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,6 +125,7 @@ fun AdminScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier          = Modifier.fillMaxWidth()
                 ) {
+
                     IconButton(
                         onClick = {
                             navController.navigate("home") {
@@ -136,13 +138,16 @@ fun AdminScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(AccentPurple.copy(alpha = 0.2f)),
+                                .background(
+                                    AccentPurple.copy(alpha = 0.2f)
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
+
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
-                                tint     = Color.White,
+                                tint = Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -163,6 +168,26 @@ fun AdminScreen(
                             color    = Color.Black.copy(alpha = 0.45f)
                         )
                     }
+//
+//                    Box(
+//                        modifier = Modifier
+//                            .size(34.dp)
+//                            .clip(RoundedCornerShape(10.dp))
+//                            .background(AccentPurple.copy(alpha = 0.1f)),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        IconButton(
+//                            onClick  = { viewModel.loadAllReports() },
+//                            modifier = Modifier.size(34.dp)
+//                        ) {
+//                            Icon(
+//                                Icons.Default.Refresh,
+//                                contentDescription = "Actualizar",
+//                                tint     = AccentPurple,
+//                                modifier = Modifier.size(17.dp)
+//                            )
+//                        }
+//                    }
                 }
             }
 
@@ -249,6 +274,7 @@ fun AdminScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 contentPadding        = PaddingValues(horizontal = 0.dp)
                             ) {
+                                // Chip "Todos"
                                 item {
                                     val isSelected = selectedFilter == null
                                     Surface(
@@ -284,10 +310,10 @@ fun AdminScreen(
                                                         .padding(horizontal = 6.dp, vertical = 1.dp)
                                                 ) {
                                                     Text(
-                                                        text       = "${uiState.reports.size}",
-                                                        fontSize   = 10.sp,
+                                                        text      = "${uiState.reports.size}",
+                                                        fontSize  = 10.sp,
                                                         fontWeight = FontWeight.Medium,
-                                                        color      = if (isSelected) AccentPurple
+                                                        color     = if (isSelected) AccentPurple
                                                         else Color.White.copy(alpha = 0.5f)
                                                     )
                                                 }
@@ -296,6 +322,7 @@ fun AdminScreen(
                                     }
                                 }
 
+                                // Chips por estado
                                 items(ReportStatus.entries) { statusOption ->
                                     val isSelected = selectedFilter == statusOption
                                     val count = uiState.reports.count {
@@ -402,7 +429,7 @@ fun AdminScreen(
 // ── CARD DE REPORTE ───────────────────────────────────────────────────────────
 @Composable
 fun AdminReportCard(
-    report        : ReportResponse,
+    report        : Report,
     isLoading     : Boolean,
     onStatusChange: (String) -> Unit,
     onDelete      : () -> Unit
@@ -458,20 +485,6 @@ fun AdminReportCard(
                         )
                     }
                 }
-            }
-
-            // ── IMAGEN SIEMPRE VISIBLE ────────────────────
-            report.photoUrl?.let { url ->
-                Spacer(Modifier.height(12.dp))
-                AsyncImage(
-                    model              = url,
-                    contentDescription = "Foto del reporte",
-                    contentScale       = ContentScale.Crop,
-                    modifier           = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                )
             }
 
             Spacer(Modifier.height(13.dp))
@@ -631,7 +644,7 @@ fun AdminReportCard(
                 }
             }
 
-            // ── DETALLE EXPANDIBLE (sin imagen, ya está arriba) ──────────
+            // ── DETALLE EXPANDIBLE ────────────────────────
             AnimatedVisibility(
                 visible = detailExpanded,
                 enter   = expandVertically(),
@@ -642,13 +655,55 @@ fun AdminReportCard(
                     HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
                     Spacer(Modifier.height(12.dp))
 
-                    report.userName?.let            { DetailRow(Icons.Default.Person,      "Usuario",     it) }
-                    report.userEmail?.let           { DetailRow(Icons.Default.Email,        "Correo",      it) }
-                    report.approximateLocation?.let { DetailRow(Icons.Default.LocationOn,   "Ubicación",   it) }
-                    if (report.latitude != null && report.longitude != null) {
-                        DetailRow(Icons.Default.MyLocation, "Coordenadas", "${report.latitude}, ${report.longitude}")
+                    report.photoUrl?.let { url ->
+                        AsyncImage(
+                            model              = url,
+                            contentDescription = "Foto del reporte",
+                            contentScale       = ContentScale.Crop,
+                            modifier           = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+
+                    report.userName?.let { DetailRow(Icons.Default.Person, "Usuario", it) }
+                    report.userEmail?.let { DetailRow(Icons.Default.Email, "Correo", it) }
+                    report.approximateLocation?.let { DetailRow(Icons.Default.LocationOn, "Ubicación", it) }
+                    if (report.location.latitude != null && report.location.longitude != null) {
+                        DetailRow(Icons.Default.MyLocation, "Coordenadas", "${report.location.latitude}, ${report.location.longitude}")
                     }
                     report.category?.let { DetailRow(Icons.Default.Category, "Categoría", it) }
+
+                    // ── ATRIBUTOS: Severity, Affected Users, Priority Level ──
+                    DetailRow(
+                        icon = Icons.Default.Warning,
+                        label = "Severidad",
+                        value = when (report.severity) {
+                            1 -> "Baja"
+                            2 -> "Media"
+                            3 -> "Alta"
+                            else -> "${report.severity}"
+                        }
+                    )
+
+                    DetailRow(
+                        icon = Icons.Default.People,
+                        label = "Afectados",
+                        value = "${report.affectedUsers} usuarios"
+                    )
+
+                    DetailRow(
+                        icon = Icons.Default.Flag,
+                        label = "Prioridad",
+                        value = when (report.priorityLevel) {
+                            PriorityLevel.LOW -> "Baja"
+                            PriorityLevel.MEDIUM -> "Media"
+                            PriorityLevel.HIGH -> "Alta"
+                            PriorityLevel.CRITICAL -> "Crítica"
+                        }
+                    )
                 }
             }
 

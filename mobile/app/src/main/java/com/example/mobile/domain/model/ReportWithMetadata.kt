@@ -1,7 +1,6 @@
 package com.example.mobile.domain.model
 
-
-data class Report(
+data class ReportWithMetada(
     val id: Long,
     val location: Location,
     val description: String,
@@ -14,14 +13,8 @@ data class Report(
     val userId: Long? = null,
     val userName: String? = null,
 
-    val userEmail: String?,
-
-    val reportDate: String?,
-//    val latitude: Double?,
-//    val longitude: Double?,
-
     val severity: Int = 1,
     val affectedUsers: Int = 0,
     val priorityLevel: PriorityLevel,
-    val userHasVoted: Boolean = false
+    //val userHasVoted: Boolean = false
 )

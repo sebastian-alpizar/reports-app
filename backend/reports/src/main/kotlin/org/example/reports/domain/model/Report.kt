@@ -12,5 +12,6 @@ data class Report(
     val category: String?,
     val status: ReportStatus,
     val user: User,
-    val photoUrl: String?
+    val photoUrl: String?,
+    val severity: Int = 1
 )

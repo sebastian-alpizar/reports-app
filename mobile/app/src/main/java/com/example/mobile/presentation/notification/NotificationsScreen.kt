@@ -72,12 +72,7 @@ fun NotificationsScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
 
-                    IconButton(
-                        onClick = {
-                            navController.navigate("home")
-                        }
-                    ) {
-
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
@@ -87,7 +82,6 @@ fun NotificationsScreen(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,

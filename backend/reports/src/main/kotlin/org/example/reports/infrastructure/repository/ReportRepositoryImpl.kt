@@ -1,5 +1,6 @@
 package org.example.reports.infrastructure.repository
 
+import org.example.reports.application.usecase.reports.PriorityCalculator
 import org.example.reports.domain.model.Report
 import org.example.reports.domain.model.ReportStatus
 import org.example.reports.domain.repository.ReportRepository
@@ -57,5 +58,4 @@ class ReportRepositoryImpl(
 
         save(updatedReport)
     }
-
 }

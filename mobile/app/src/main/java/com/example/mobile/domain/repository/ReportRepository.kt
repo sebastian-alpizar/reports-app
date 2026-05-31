@@ -1,22 +1,23 @@
 package com.example.mobile.domain.repository
 
 import android.content.Context
-import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.data.remote.dto.CreateReportDto
+import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.domain.model.Report
 import com.example.mobile.domain.model.ReportStatus
 
 interface ReportRepository {
     suspend fun sendReport(
         context: Context,
-        report: Report
+        report: CreateReportDto
     ): Result<Unit>
 
-    suspend fun getAllReports(): Result<List<ReportResponse>>
+    suspend fun getAllReports(): Result<List<Report>>
 
     suspend fun updateReportStatus(
         id: Long,
-        status: ReportStatus
-    ): Result<Unit>
+        status: UpdateStatusRequest
+    ): Result<String>
 
     suspend fun getNearbyReports(
         latitude: Double?,
@@ -26,11 +27,14 @@ interface ReportRepository {
 
     suspend fun updateReport(
         context: Context,
-        reportId: String,
+        reportId: Long,
         description: String,
         imageUri: String?
     ): Result<Unit>
 
-    suspend fun deleteReport(reportId: String): Result<Unit>
+    suspend fun deleteReport(reportId: Long): Result<Unit>
 
+    suspend fun voteReport(reportId: Long): Result<String>
+    
+    suspend fun getReportsByUser(userId: Long): Result<List<Report>>
 }
