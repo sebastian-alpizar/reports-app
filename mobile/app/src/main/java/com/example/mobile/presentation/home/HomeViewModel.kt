@@ -58,7 +58,7 @@ class HomeViewModel @Inject constructor(
     private val deleteReportUseCase: DeleteReportUseCase,
     private val getNearbyReportsUseCase: GetNearbyReportsUseCase,
     private val tokenManager: TokenManager,
-    private val voteReportUseCase: VoteReportUseCase
+    private val voteReportUseCase: VoteReportUseCase,
     private val reverseGeocodeUseCase: ReverseGeocodeUseCase,
 ) : ViewModel() {
 
