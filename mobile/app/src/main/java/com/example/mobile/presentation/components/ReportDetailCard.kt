@@ -303,17 +303,17 @@ private fun LocationSection(location: String) {
 
 @Composable
 private fun StatusSection(status: String) {
-    val statusColor = when (status.lowercase()) {
-        "activo", "pending"    -> Color(0xFFF59E0B)
-        "in_progress"          -> Color(0xFF3B82F6)
-        "resuelto", "resolved" -> Color(0xFF22C55E)
-        else                   -> Color.Gray
+    val (label, statusColor) = when (status.uppercase()) {
+        "PENDING"  -> "Pendiente"  to Color(0xFFF59E0B)
+        "REJECTED" -> "En proceso" to Color(0xFF3B82F6)
+        "APPROVED" -> "Resuelto"   to Color(0xFF22C55E)
+        else       -> status       to Color.Gray
     }
 
     Text(
-        text = "Estado: ${status.replaceFirstChar { it.uppercase() }}",
-        color = statusColor,
-        fontSize = 12.sp,
+        text       = "Estado: $label",
+        color      = statusColor,
+        fontSize   = 12.sp,
         fontWeight = FontWeight.Medium
     )
 }

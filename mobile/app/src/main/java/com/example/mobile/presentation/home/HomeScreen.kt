@@ -45,6 +45,11 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     val uiState = viewModel.uiState
+
+    DisposableEffect(Unit) {
+        viewModel.refreshReports()
+        onDispose { }
+    }
     val reportFormState = viewModel.reportFormState
     val context = LocalContext.current
 

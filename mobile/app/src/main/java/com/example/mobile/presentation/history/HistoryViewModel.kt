@@ -3,8 +3,8 @@ package com.example.mobile.presentation.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
-import com.example.mobile.domain.model.Report
-import com.example.mobile.domain.usecase.GetReportsByUserUseCase
+import com.example.mobile.data.remote.api.ReportApi
+import com.example.mobile.data.remote.dto.ReportResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,13 +14,13 @@ import javax.inject.Inject
 
 data class HistoryUiState(
     val isLoading: Boolean = false,
-    val reports: List<Report> = emptyList(),
+    val reports: List<ReportResponse> = emptyList(),
     val error: String? = null
 )
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val getReportsByUserUseCase: GetReportsByUserUseCase,
+    private val reportApi: ReportApi,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -33,16 +33,13 @@ class HistoryViewModel @Inject constructor(
 
     private fun loadReports() {
         viewModelScope.launch {
-
-            _uiState.value = _uiState.value.copy(
-                isLoading = true,
-                error = null
-            )
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             try {
                 val userId = tokenManager.getUserId()
+                android.util.Log.d("HistoryVM", "userId: $userId")
 
-                if (userId == -1L || userId == null) {
+                if (userId == null) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = "No se encontró el usuario logueado"
@@ -50,15 +47,20 @@ class HistoryViewModel @Inject constructor(
                     return@launch
                 }
 
-                val reports = getReportsByUserUseCase(userId)
+                // Usamos getAllReports y filtramos por userId
+                // porque getReportsByUser no retorna photoUrl correctamente desde el backend
+                val reports = reportApi.getAllReports()
+                    .filter { it.userId == userId }
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    reports = reports
-                )
+                android.util.Log.d("HistoryVM", "reportes: ${reports.size}")
+                reports.forEach {
+                    android.util.Log.d("HistoryVM", "reporte ${it.id} - photoUrl: ${it.photoUrl}")
+                }
+
+                _uiState.value = _uiState.value.copy(isLoading = false, reports = reports)
 
             } catch (e: Exception) {
-
+                android.util.Log.e("HistoryVM", "Error: ${e.message}", e)
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Error desconocido"
