@@ -13,6 +13,7 @@ import com.example.mobile.presentation.notification.NotificationsScreen
 import com.example.mobile.presentation.profile.ProfileScreen
 
 import com.example.mobile.presentation.profile.ProfileScreen
+import com.example.mobile.presentation.statistics.StatisticsScreen
 
 @Composable
 fun NavGraph() {
@@ -48,6 +49,10 @@ fun NavGraph() {
 
         composable("notifications") {
             NotificationsScreen(navController)
+        }
+
+        composable("statistics") {
+            StatisticsScreen(navController)
         }
     }
 }

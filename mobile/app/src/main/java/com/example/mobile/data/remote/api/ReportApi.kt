@@ -2,6 +2,7 @@ package com.example.mobile.data.remote.api
 
 import com.example.mobile.data.remote.dto.ApiResponseDto
 import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.data.remote.dto.StatisticsResponse
 import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.data.remote.dto.UserDto
 import okhttp3.MultipartBody
@@ -59,4 +60,8 @@ interface ReportApi {
     suspend fun voteReport(
         @Path("id") reportId: Long
     ): ApiResponseDto<String>
+
+    @GET("reports/statistics")
+    suspend fun getStatistics(
+    ): ApiResponseDto<StatisticsResponse>
 }
