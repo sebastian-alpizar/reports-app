@@ -3,8 +3,8 @@ package com.example.mobile.presentation.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
-import com.example.mobile.data.remote.api.ReportApi
-import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.domain.model.Report
+import com.example.mobile.domain.usecase.GetReportsByUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,13 +14,13 @@ import javax.inject.Inject
 
 data class HistoryUiState(
     val isLoading: Boolean = false,
-    val reports: List<ReportResponse> = emptyList(),
+    val reports: List<Report> = emptyList(),
     val error: String? = null
 )
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val reportApi: ReportApi,
+    private val getReportsByUserUseCase: GetReportsByUserUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -33,13 +33,16 @@ class HistoryViewModel @Inject constructor(
 
     private fun loadReports() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null
+            )
 
             try {
                 val userId = tokenManager.getUserId()
-                android.util.Log.d("HistoryVM", "userId: $userId")
 
-                if (userId == null) {
+                if (userId == -1L || userId == null) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = "No se encontró el usuario logueado"
@@ -47,13 +50,15 @@ class HistoryViewModel @Inject constructor(
                     return@launch
                 }
 
-                val reports = reportApi.getReportsByUser(userId)
-                android.util.Log.d("HistoryVM", "reportes: ${reports.size}")
+                val reports = getReportsByUserUseCase(userId)
 
-                _uiState.value = _uiState.value.copy(isLoading = false, reports = reports)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    reports = reports
+                )
 
             } catch (e: Exception) {
-                android.util.Log.e("HistoryVM", "Error: ${e.message}", e)
+
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Error desconocido"

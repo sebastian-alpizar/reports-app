@@ -3,10 +3,10 @@ package com.example.mobile.domain.usecase
 import com.example.mobile.domain.repository.ReportRepository
 import javax.inject.Inject
 
-class DeleteReportUseCase @Inject constructor(
+class VoteReportUseCase @Inject constructor(
     private val repository: ReportRepository
 ) {
-    suspend operator fun invoke(reportId: Long): Result<Unit> {
-        return repository.deleteReport(reportId)
+    suspend operator fun invoke(reportId: Long): Result<String> {
+        return repository.voteReport(reportId)
     }
 }

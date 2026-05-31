@@ -9,7 +9,7 @@ class UpdateReportUseCase  @Inject constructor(
 ) {
     suspend operator fun invoke(
         context: Context,
-        reportId: String,
+        reportId: Long,
         description: String,
         imageUri: String?
     ): Result<Unit> {

@@ -9,12 +9,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
+import com.example.mobile.data.remote.dto.CreateReportDto
 import com.example.mobile.domain.model.Location
 import com.example.mobile.domain.model.Report
 import com.example.mobile.domain.usecase.DeleteReportUseCase
 import com.example.mobile.domain.usecase.GetNearbyReportsUseCase
 import com.example.mobile.domain.usecase.SendReportUseCase
 import com.example.mobile.domain.usecase.UpdateReportUseCase
+import com.example.mobile.domain.usecase.VoteReportUseCase
 import com.example.mobile.domain.usecase.location.GetLocationUpdatesUseCase
 import com.example.mobile.domain.usecase.location.HasLocationPermissionUseCase
 import com.example.mobile.domain.usecase.location.ReverseGeocodeUseCase
@@ -55,8 +57,9 @@ class HomeViewModel @Inject constructor(
     private val updateReportUseCase: UpdateReportUseCase,
     private val deleteReportUseCase: DeleteReportUseCase,
     private val getNearbyReportsUseCase: GetNearbyReportsUseCase,
+    private val tokenManager: TokenManager,
+    private val voteReportUseCase: VoteReportUseCase
     private val reverseGeocodeUseCase: ReverseGeocodeUseCase,
-    private val tokenManager: TokenManager
 ) : ViewModel() {
 
     var uiState by mutableStateOf(HomeUiState())
@@ -106,7 +109,6 @@ class HomeViewModel @Inject constructor(
                     if (prev == null || distanceMeters(prev, location) > 200) {
                         loadNearbyReports(location.latitude, location.longitude)
                     }
-
 //                    uiState = uiState.copy(currentLocation = location, isLoading = false)
                 }
         }
@@ -130,7 +132,15 @@ class HomeViewModel @Inject constructor(
             uiState = uiState.copy(isLoadingReports = true)
             getNearbyReportsUseCase(latitude, longitude, 0.5)
                 .onSuccess { reports ->
-                    uiState = uiState.copy(nearbyReports = reports, isLoadingReports = false)
+                    val updatedSelectedReport =
+                        uiState.selectedReport?.let { selected ->
+                            reports.find { it.id == selected.id }
+                        }
+                    uiState = uiState.copy(
+                        nearbyReports = reports,
+                        selectedReport = updatedSelectedReport,
+                        isLoadingReports = false
+                    )
                 }
                 .onFailure {
                     uiState = uiState.copy(isLoadingReports = false)
@@ -160,7 +170,7 @@ class HomeViewModel @Inject constructor(
                     uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
                 }
                 .onFailure { error ->
-                    _event.emit(UiEvent.ShowSnackbar("Error al eliminar: ${error.message}", true))
+                    _event.emit(UiEvent.ShowSnackbar(error.message ?: "Error al eliminar", true))
                 }
         }
     }
@@ -169,38 +179,6 @@ class HomeViewModel @Inject constructor(
         if (!show) reportFormState = ReportFormState()
         uiState = uiState.copy(showReportModal = show)
     }
-
-
-//    fun sendReport(context: Context) {
-//        if (!validateReportForm()) return
-//        val currentLocation = uiState.currentLocation ?: run {
-//            viewModelScope.launch { _event.emit(UiEvent.ShowSnackbar("No se ha obtenido la ubicación aún", true)) }
-//            return
-//        }
-//        viewModelScope.launch {
-//            reportFormState = reportFormState.copy(isSubmitting = true)
-//            val report = Report(
-//                location = currentLocation,
-//                description = reportFormState.description,
-//                imageUri = reportFormState.selectedImageUri
-//            )
-//            val result = sendReportUseCase(context, report)
-//            reportFormState = reportFormState.copy(isSubmitting = false)
-//            result.fold(
-//                onSuccess = {
-//                    _event.emit(UiEvent.ShowSnackbar("Reporte enviado exitosamente", false))
-//                    toggleReportModal(false)
-//                    uiState.currentLocation?.let {
-//                        loadNearbyReports(it.latitude, it.longitude)
-//                    }
-//                },
-//                onFailure = { error ->
-//                    _event.emit(UiEvent.ShowSnackbar("Error al enviar reporte: ${error.message}", true))
-//                }
-//            )
-//        }
-//    }
-
 
     fun sendReport(context: Context) {
         val editing = uiState.editingReport
@@ -221,19 +199,21 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             reportFormState = reportFormState.copy(isSubmitting = true)
+            // val report = CreateReportDto(
 
             val approximateLocation = reverseGeocodeUseCase(
                 context   = context,
                 latitude  = currentLocation.latitude,
                 longitude = currentLocation.longitude
             )
-            val report = Report(
+            val report = CreateReportDto(
                 location    = currentLocation,
                 description = reportFormState.description,
                 imageUri    = reportFormState.selectedImageUri,
                 approximateLocation = approximateLocation
             )
             val result = sendReportUseCase(context, report)
+            println("RESULTADO: $result")
             reportFormState = reportFormState.copy(isSubmitting = false)
             result.fold(
                 onSuccess = {
@@ -242,7 +222,7 @@ class HomeViewModel @Inject constructor(
                     uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
                 },
                 onFailure = { error ->
-                    _event.emit(UiEvent.ShowSnackbar("Error al enviar reporte: ${error.message}", true))
+                    _event.emit(UiEvent.ShowSnackbar(error.message ?: "Error al crear reporte", true))
                 }
             )
         }
@@ -268,7 +248,7 @@ class HomeViewModel @Inject constructor(
                 onSuccess = {
                     _event.emit(UiEvent.ShowSnackbar("Reporte actualizado exitosamente", false))
                     toggleReportModal(false)
-                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
+                    //uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
                 },
                 onFailure = { error ->
                     _event.emit(UiEvent.ShowSnackbar("Error al actualizar: ${error.message}", true))
@@ -313,5 +293,35 @@ class HomeViewModel @Inject constructor(
         val dx = (b.longitude!! - a.longitude!!) * 111_320 * Math.cos(Math.toRadians(a.latitude!!))
         val dy = (b.latitude!! - a.latitude) * 110_540
         return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    fun voteReport(report: Report) {
+
+         if (report.userHasVoted) return
+
+        uiState = uiState.copy(isLoading = true)
+
+        viewModelScope.launch {
+
+            voteReportUseCase(report.id)
+                .onSuccess { message ->
+//                    _event.emit(
+//                        UiEvent.ShowSnackbar(message, false)
+//                    )
+                    uiState.currentLocation?.let {
+                        loadNearbyReports(
+                            it.latitude,
+                            it.longitude
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _event.emit(
+                        UiEvent.ShowSnackbar(error.message ?: "Error al votar", true
+                        )
+                    )
+                }
+            uiState = uiState.copy(isLoading = false)
+        }
     }
 }

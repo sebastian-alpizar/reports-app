@@ -1,5 +1,6 @@
 package org.example.reports.presentation.dto
 
+import org.example.reports.domain.model.PriorityLevel
 import java.time.LocalDateTime
 
 data class ReportResponse(
@@ -14,5 +15,9 @@ data class ReportResponse(
     val userName: String,
     val userEmail: String,
     val userId: Long,
-    val photoUrl: String?
+    val photoUrl: String?,
+    val severity: Int,
+    val affectedUsers: Int,
+    val priorityLevel: PriorityLevel,
+    val userHasVoted: Boolean
 )
