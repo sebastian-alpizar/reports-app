@@ -192,11 +192,13 @@ fun HomeScreen(
 
                             // Detalle con imagen y botón editar
                             ReportDetailCard(
+                                isLoading     = viewModel.uiState.isLoading,
                                 report        = uiState.selectedReport,
                                 currentUserId = viewModel.currentUserId,
                                 onDismiss     = { viewModel.onDismissReportDetail() },
                                 onEditClicked = { report -> viewModel.onEditReport(report) },
                                 onDeleteClicked = { report -> viewModel.onDeleteReport(report) },
+                                onVoteClicked = { report -> viewModel.voteReport(report) },
                                 modifier      = Modifier
                                     .align(Alignment.Center)
                                     .padding(bottom = 16.dp)

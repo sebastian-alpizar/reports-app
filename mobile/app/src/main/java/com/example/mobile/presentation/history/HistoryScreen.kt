@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.domain.model.Report
 import com.example.mobile.presentation.components.AppBackground
 import com.example.mobile.presentation.utils.DateFormatter
 
@@ -163,7 +163,7 @@ fun HistoryScreen(
 
 // ── CARD ──────────────────────────────────────────────────────────────────────
 @Composable
-private fun ReportCard(report: ReportResponse) {
+private fun ReportCard(report: Report) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

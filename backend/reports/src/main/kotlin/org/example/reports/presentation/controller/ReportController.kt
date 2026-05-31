@@ -5,6 +5,7 @@ import org.example.reports.application.usecase.reports.DeleteReportUseCase
 import org.example.reports.application.usecase.reports.GetReportsUseCase
 import org.example.reports.application.usecase.reports.UpdateReportStatusUseCase
 import org.example.reports.application.usecase.reports.UpdateReportUseCase
+import org.example.reports.application.usecase.reports.VoteUseCase
 import org.example.reports.presentation.dto.ApiResponse
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.example.reports.presentation.dto.ReportResponse
@@ -24,6 +25,7 @@ class ReportController(
     private val deleteReportUseCase: DeleteReportUseCase,
     private val updateReportStatusUseCase: UpdateReportStatusUseCase,
     private val updateReportUseCase: UpdateReportUseCase,
+    private val voteUseCase: VoteUseCase,
     private val mapper: ReportDtoMapper,
 ) {
     @PostMapping(consumes = ["multipart/form-data"])
@@ -43,6 +45,7 @@ class ReportController(
             ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse(message = "Reporte creado exitosamente"))
         } catch (e: Exception) {
+            println(e)
             ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse(message = e.message ?: "Error al validar la foto"))
         }
@@ -50,8 +53,9 @@ class ReportController(
 
     @GetMapping
     fun getAll(): List<ReportResponse> {
-        return reportQueryService.getAllReports()
-            .map { mapper.toResponse(it) }
+        val result = reportQueryService.getAllReports()
+        println(result)
+        return result.map(mapper::toResponse)
     }
 
     @GetMapping("/nearby")
@@ -61,7 +65,7 @@ class ReportController(
         @RequestParam(defaultValue = "5.0") radiusKm: Double
     ): List<ReportResponse> {
         return reportQueryService.getNearbyReports(lat, lng, radiusKm)
-            .map { mapper.toResponse(it) }
+            .map(mapper::toResponse)
     }
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long): ReportResponse {
@@ -71,7 +75,7 @@ class ReportController(
     @GetMapping("/user/{userId}")
     fun getByUser(@PathVariable userId: Long): List<ReportResponse> {
         return reportQueryService.getReportsByUser(userId)
-            .map { mapper.toResponse(it) }
+            .map (mapper::toResponse)
     }
 
     @PutMapping("/{id}", consumes = ["multipart/form-data"])
@@ -83,7 +87,7 @@ class ReportController(
         return try {
             val updated = updateReportUseCase.execute(id, reportData, photo)
             ResponseEntity.ok(
-                ApiResponse(message = "Reporte actualizado exitosamente", data = mapper.toResponse(updated))
+                ApiResponse(message = "Reporte actualizado exitosamente")
             )
         } catch (e: RuntimeException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -98,12 +102,19 @@ class ReportController(
     fun delete(
         @PathVariable id: Long
     ): ResponseEntity<ApiResponse<Unit>> {
-        deleteReportUseCase.execute(id)
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "Reporte eliminado exitosamente"
+        return try {
+            deleteReportUseCase.execute(id)
+            ResponseEntity.ok(
+                ApiResponse(message = "Reporte eliminado exitosamente")
             )
-        )
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    ApiResponse(
+                        message = e.message ?: "Error al eliminar"
+                    )
+                )
+        }
     }
 
     @PatchMapping("/{id}/status")
@@ -111,16 +122,44 @@ class ReportController(
         @PathVariable id: Long,
         @RequestBody request: UpdateReportStatusRequest
     ): ResponseEntity<ApiResponse<Unit>> {
-
-        updateReportStatusUseCase.execute(
-            reportId = id,
-            status = request.status
-        )
-
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "Estado actualizado exitosamente"
+        return try {
+            updateReportStatusUseCase.execute(
+                reportId = id,
+                status = request.status
             )
-        )
+            return ResponseEntity.ok(
+                ApiResponse(
+                    message = "Estado actualizado exitosamente"
+                )
+            )
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    ApiResponse(
+                        message = e.message ?: "Error al actualizar"
+                    )
+                )
+        }
+    }
+
+    @PostMapping("/{id}/vote")
+    fun vote(
+        @PathVariable id: Long
+    ):  ResponseEntity<ApiResponse<Unit>> {
+        return try {
+            voteUseCase.execute(id)
+            ResponseEntity.ok(
+                ApiResponse(
+                    message = "Voto realizado",
+                )
+            )
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    ApiResponse(
+                        message = e.message ?: "Error al votar"
+                    )
+                )
+        }
     }
 }

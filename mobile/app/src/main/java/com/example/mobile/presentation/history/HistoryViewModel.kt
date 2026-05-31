@@ -3,8 +3,8 @@ package com.example.mobile.presentation.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobile.core.util.TokenManager
-import com.example.mobile.data.remote.api.ReportApi
-import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.domain.model.Report
+import com.example.mobile.domain.usecase.GetReportsByUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,13 +14,13 @@ import javax.inject.Inject
 
 data class HistoryUiState(
     val isLoading: Boolean = false,
-    val reports: List<ReportResponse> = emptyList(),
+    val reports: List<Report> = emptyList(),
     val error: String? = null
 )
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val reportApi: ReportApi,
+    private val getReportsByUserUseCase: GetReportsByUserUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -44,7 +44,7 @@ class HistoryViewModel @Inject constructor(
 
                 val userId = tokenManager.getUserId()
 
-                if (userId == -1L) {
+                if (userId == -1L || userId == null) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = "No se encontró el usuario logueado"
@@ -52,7 +52,7 @@ class HistoryViewModel @Inject constructor(
                     return@launch
                 }
 
-                val reports = reportApi.getReportsByUser(userId)
+                val reports = getReportsByUserUseCase(userId)
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

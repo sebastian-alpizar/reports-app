@@ -9,20 +9,25 @@ import java.util.Base64
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
+import tools.jackson.databind.ObjectMapper
 
 @Service
 class GeminiService(
 
     @Value("\${gemini.api-key}")
     private val apiKey: String
-
 ) {
 
     private val webClient = WebClient.builder()
         .baseUrl("https://generativelanguage.googleapis.com")
         .build()
 
-    fun validateImage(photo: MultipartFile): Boolean {
+    private val objectMapper = ObjectMapper()
+
+    fun analyzeReport(
+        photo: MultipartFile,
+        description: String
+    ): ReportAnalysisResponse {
 
         validateBasicRules(photo)
 
@@ -30,21 +35,47 @@ class GeminiService(
             .encodeToString(compressImage(photo))
 
         val prompt = """
-            Analiza esta imagen para una aplicación de reportes ciudadanos.
-
-            La imagen:
-            - debe representar un problema urbano real
-            - no debe contener desnudos
-            - no debe contener violencia explícita
-            - no debe ser selfie
-            - no debe ser meme
-            - no debe ser screenshot
-            - no debe ser contenido ofensivo
-
-            Responde SOLO:
-            VALID
-            o
-            INVALID
+            Analiza esta imagen y descripción para una aplicación de reportes ciudadanos.
+    
+            Descripción:
+            $description
+    
+            Debes determinar:
+    
+            1. Si la imagen es válida
+            2. La categoría
+            3. La severidad del 1 al 5
+    
+            La imagen NO es válida si:
+            - contiene desnudos
+            - contiene violencia explícita
+            - es selfie
+            - es meme
+            - es screenshot
+            - no representa un problema urbano real
+    
+            Categorías posibles:
+            - Basura
+            - Hueco
+            - Accidente
+            - Inundación
+            - Incendio
+            - Cableado
+            - Alumbrado
+            - Vandalismo
+            - Otro
+    
+            Responde únicamente con JSON válido.
+            No utilices markdown.
+            No utilices ```json.
+            No agregues explicaciones.
+    
+            Ejemplo:
+            {
+              "valid": true,
+              "category": "Hueco",
+              "severity": 4
+            }
         """.trimIndent()
 
         val request = GeminiRequest(
@@ -90,10 +121,22 @@ class GeminiService(
                 ?.firstOrNull()
                 ?.text
                 ?.trim()
-                ?.uppercase()
 
-            return result?.contains("VALID") == true &&
-                    result.contains("INVALID").not()
+            println("Respuesta cruda: $response")
+            println("Respuesta parseada 1: $result")
+
+            val json = result
+                ?.replace("```json", "", ignoreCase = true)
+                ?.replace("```JSON", "", ignoreCase = true)
+                ?.replace("```", "")
+                ?.trim()
+
+            println("Respuesta parseada 2: $json")
+
+            return objectMapper.readValue(
+                result,
+                ReportAnalysisResponse::class.java
+            )
 
         } catch (e: Exception) {
             println(e)

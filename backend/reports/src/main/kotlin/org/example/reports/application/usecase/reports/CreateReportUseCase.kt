@@ -33,10 +33,14 @@ class CreateReportUseCase(
         val user = userRepository.findByEmail(email)
             ?: throw RuntimeException("Usuario no encontrado")
 
-//        val validImage = geminiService.validateImage(photo)
-//
-//        if (!validImage) {
-//            throw RuntimeException("La imagen no es apta para la plataforma")
+//        val analysis = geminiService.analyzeReport(
+//            photo = photo,
+//            description = request.description
+//        )
+//        if (!analysis.valid) {
+//            throw RuntimeException(
+//                "La imagen no es apta para la plataforma"
+//            )
 //        }
 
         val photoUrl = try {
@@ -54,7 +58,8 @@ class CreateReportUseCase(
             category = request.category,
             photoUrl = null,
             status = ReportStatus.PENDING,
-            user = user
+            user = user,
+            //severity = analysis.severity,
         )
         val savedReport = reportRepository.save(report)
         val admins = userRepository.findByIsAdminTrue()

@@ -1,8 +1,8 @@
-package com.example.mobile.domain.model
+package com.example.mobile.data.remote.dto
 
+import com.example.mobile.domain.model.Location
 
-data class Report(
-    val id: Long,
+data class CreateReportDto (
     val location: Location,
     val description: String,
     val imageUri: String? = null,
@@ -13,15 +13,4 @@ data class Report(
     val photoUrl: String?= null,
     val userId: Long? = null,
     val userName: String? = null,
-
-    val userEmail: String?,
-
-    val reportDate: String?,
-//    val latitude: Double?,
-//    val longitude: Double?,
-
-    val severity: Int = 1,
-    val affectedUsers: Int = 0,
-    val priorityLevel: PriorityLevel,
-    val userHasVoted: Boolean = false
 )

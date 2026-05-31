@@ -1,5 +1,6 @@
 package com.example.mobile.data.remote.api
 
+import com.example.mobile.data.remote.dto.ApiResponseDto
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.data.remote.dto.UserDto
@@ -29,7 +30,7 @@ interface ReportApi {
 
     @GET("reports/user/{userId}")
     suspend fun getReportsByUser(
-        @Path("userId") userId: Long?
+        @Path("userId") userId: Long
     ): List<ReportResponse>
 
     @GET("users/{id}")
@@ -39,12 +40,12 @@ interface ReportApi {
     suspend fun updateReportStatus(
         @Path("id") id: Long,
         @Body body: UpdateStatusRequest
-    )
+    ): ApiResponseDto<Unit>
 
     @DELETE("reports/{id}")
     suspend fun deleteReport(
         @Path("id") id: Long
-    )
+    ):  ApiResponseDto<String>
 
 
     @GET("reports/nearby")
@@ -53,4 +54,9 @@ interface ReportApi {
         @Query("lng") longitude: Double?,
         @Query("radiusKm") radiusKm: Double = 5.0
     ): List<ReportResponse>
+
+    @POST("reports/{id}/vote")
+    suspend fun voteReport(
+        @Path("id") reportId: Long
+    ): ApiResponseDto<String>
 }

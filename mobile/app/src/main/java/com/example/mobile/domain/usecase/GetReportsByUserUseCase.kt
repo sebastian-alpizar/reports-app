@@ -4,10 +4,10 @@ import com.example.mobile.domain.model.Report
 import com.example.mobile.domain.repository.ReportRepository
 import javax.inject.Inject
 
-class GetAllReportsUseCase @Inject constructor(
+class GetReportsByUserUseCase @Inject constructor(
     private val reportRepository: ReportRepository
 ) {
-    suspend operator fun invoke(): List<Report> {
-        return reportRepository.getAllReports().getOrThrow()
+    suspend operator fun invoke(userId: Long): List<Report> {
+        return reportRepository.getReportsByUser(userId).getOrThrow()
     }
 }

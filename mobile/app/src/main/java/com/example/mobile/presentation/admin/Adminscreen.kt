@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.domain.model.PriorityLevel
+import com.example.mobile.domain.model.Report
 import com.example.mobile.presentation.components.AppBackground
+import com.example.mobile.presentation.home.HomeViewModel
 import com.example.mobile.presentation.utils.DateFormatter
 
 // ── COLORES ───────────────────────────────────────────────────────────────────
@@ -81,7 +83,7 @@ private enum class ReportStatus(
 @Composable
 fun AdminScreen(
     navController: NavController,
-    viewModel: AdminViewModel = hiltViewModel()
+    viewModel: AdminViewModel = hiltViewModel(),
 ) {
     val uiState     by viewModel.uiState.collectAsState()
     var searchQuery    by remember { mutableStateOf("") }
@@ -427,7 +429,7 @@ fun AdminScreen(
 // ── CARD DE REPORTE ───────────────────────────────────────────────────────────
 @Composable
 fun AdminReportCard(
-    report        : ReportResponse,
+    report        : Report,
     isLoading     : Boolean,
     onStatusChange: (String) -> Unit,
     onDelete      : () -> Unit
@@ -669,11 +671,39 @@ fun AdminReportCard(
                     report.userName?.let { DetailRow(Icons.Default.Person, "Usuario", it) }
                     report.userEmail?.let { DetailRow(Icons.Default.Email, "Correo", it) }
                     report.approximateLocation?.let { DetailRow(Icons.Default.LocationOn, "Ubicación", it) }
-                    if (report.latitude != null && report.longitude != null) {
-                        DetailRow(Icons.Default.MyLocation, "Coordenadas", "${report.latitude}, ${report.longitude}")
+                    if (report.location.latitude != null && report.location.longitude != null) {
+                        DetailRow(Icons.Default.MyLocation, "Coordenadas", "${report.location.latitude}, ${report.location.longitude}")
                     }
                     report.category?.let { DetailRow(Icons.Default.Category, "Categoría", it) }
-                    // DetailRow(Icons.Default.Tag, "ID", "#${report.id}")
+
+                    // ── ATRIBUTOS: Severity, Affected Users, Priority Level ──
+                    DetailRow(
+                        icon = Icons.Default.Warning,
+                        label = "Severidad",
+                        value = when (report.severity) {
+                            1 -> "Baja"
+                            2 -> "Media"
+                            3 -> "Alta"
+                            else -> "${report.severity}"
+                        }
+                    )
+
+                    DetailRow(
+                        icon = Icons.Default.People,
+                        label = "Afectados",
+                        value = "${report.affectedUsers} usuarios"
+                    )
+
+                    DetailRow(
+                        icon = Icons.Default.Flag,
+                        label = "Prioridad",
+                        value = when (report.priorityLevel) {
+                            PriorityLevel.LOW -> "Baja"
+                            PriorityLevel.MEDIUM -> "Media"
+                            PriorityLevel.HIGH -> "Alta"
+                            PriorityLevel.CRITICAL -> "Crítica"
+                        }
+                    )
                 }
             }
 

@@ -211,8 +211,8 @@ fun ReportModal(
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
-//                                .padding(bottom = 14.dp),
+                                .fillMaxWidth()
+                                .padding(bottom = 14.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             // Botón Cámara
