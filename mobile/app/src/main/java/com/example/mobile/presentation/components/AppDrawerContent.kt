@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
@@ -40,6 +41,7 @@ fun AppDrawerContent(
     onLogout: () -> Unit,
     onNotifications: () -> Unit,
     onAdmin: () -> Unit,
+    onStatistics: () -> Unit,
     isAdmin: Boolean
 ) {
     ModalDrawerSheet(
@@ -125,6 +127,14 @@ fun AppDrawerContent(
                     icon = Icons.Default.Description,
                     label = "Administrador",
                     onClick = onAdmin
+                )
+            }
+
+            if (isAdmin){
+                DrawerItem(
+                    icon = Icons.Default.QueryStats,
+                    label = "Estadísticas",
+                    onClick = onStatistics
                 )
             }
 

@@ -120,12 +120,7 @@ fun NotificationsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-
-                    CircularProgressIndicator(
-                        color = AccentPurpleLight,
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(36.dp)
-                    )
+                    CircularProgressIndicator(color = Color.White)
                 }
 
             } else {

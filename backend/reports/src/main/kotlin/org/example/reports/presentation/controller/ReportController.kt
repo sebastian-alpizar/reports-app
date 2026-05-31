@@ -3,12 +3,14 @@ package org.example.reports.presentation.controller
 import org.example.reports.application.usecase.reports.CreateReportUseCase
 import org.example.reports.application.usecase.reports.DeleteReportUseCase
 import org.example.reports.application.usecase.reports.GetReportsUseCase
+import org.example.reports.application.usecase.reports.GetStatisticsUseCase
 import org.example.reports.application.usecase.reports.UpdateReportStatusUseCase
 import org.example.reports.application.usecase.reports.UpdateReportUseCase
 import org.example.reports.application.usecase.reports.VoteUseCase
 import org.example.reports.presentation.dto.ApiResponse
 import org.example.reports.presentation.dto.CreateReportRequest
 import org.example.reports.presentation.dto.ReportResponse
+import org.example.reports.presentation.dto.StatisticsResponse
 import org.example.reports.presentation.dto.UpdateReportRequest
 import org.example.reports.presentation.dto.UpdateReportStatusRequest
 import org.example.reports.presentation.mapper.ReportDtoMapper
@@ -26,6 +28,7 @@ class ReportController(
     private val updateReportStatusUseCase: UpdateReportStatusUseCase,
     private val updateReportUseCase: UpdateReportUseCase,
     private val voteUseCase: VoteUseCase,
+    private val getStatisticsUseCase: GetStatisticsUseCase,
     private val mapper: ReportDtoMapper,
 ) {
     @PostMapping(consumes = ["multipart/form-data"])
@@ -156,6 +159,26 @@ class ReportController(
                 .body(
                     ApiResponse(
                         message = e.message ?: "Error al votar"
+                    )
+                )
+        }
+    }
+
+    @GetMapping("/statistics")
+    fun getStatistics():  ResponseEntity<ApiResponse<StatisticsResponse>> {
+        return try {
+            val result = getStatisticsUseCase.execute()
+            ResponseEntity.ok(
+                ApiResponse(
+                    message = "Estadísticas obtenidas",
+                    data = result
+                )
+            )
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    ApiResponse(
+                        message = e.message ?: "Error al obtener estadisticas"
                     )
                 )
         }

@@ -116,6 +116,10 @@ fun HomeScreen(
                     scope.launch { drawerState.close() }
                     navController.navigate("admin")
                 },
+                onStatistics = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate("statistics")
+                },
             )
 //            {
 //                scope.launch { drawerState.close() }

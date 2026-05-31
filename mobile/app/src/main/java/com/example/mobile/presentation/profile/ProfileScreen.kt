@@ -122,7 +122,7 @@ fun ProfileScreen(
                 when {
                     uiState.isLoading -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = AccentPurpleLight, strokeWidth = 2.dp, modifier = Modifier.size(40.dp))
+                            CircularProgressIndicator(color = Color.White)
                         }
                     }
 

@@ -6,6 +6,7 @@ import com.example.mobile.data.remote.api.ReportApi
 import com.example.mobile.data.remote.dto.CreateReportDto
 import com.example.mobile.data.remote.dto.ReportRequest
 import com.example.mobile.data.remote.dto.ReportResponse
+import com.example.mobile.data.remote.dto.StatisticsResponse
 import com.example.mobile.data.remote.dto.UpdateStatusRequest
 import com.example.mobile.data.remote.util.ErrorParser
 import com.example.mobile.domain.model.Report
@@ -171,6 +172,19 @@ class ReportRepositoryImpl @Inject constructor(
             Result.failure(Exception(message))
         } catch (e: Exception) {
             Result.failure(Exception("Error de conexión"))
+        }
+    }
+
+    override suspend fun getStatistics(): Result<StatisticsResponse> {
+        return try {
+            val result = reportApi.getStatistics()
+            Result.success(result.data!!)
+        } catch (e: HttpException) {
+            val message = ErrorParser.parseError(e)
+            Result.failure(Exception(message))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
         }
     }
 
