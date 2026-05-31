@@ -57,29 +57,25 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(updatingId = reportId)
+                android.util.Log.d("AdminVM", "Llamando updateStatus...")
 
-                reportApi.updateReportStatus(
-                    reportId,
-                    UpdateStatusRequest(status = newStatus)
-                )
+                reportApi.updateReportStatus(reportId, UpdateStatusRequest(status = newStatus))
 
+                android.util.Log.d("AdminVM", "updateStatus completado")
                 _uiState.value = _uiState.value.copy(
                     reports = _uiState.value.reports.map { report ->
                         if (report.id == reportId) report.copy(status = newStatus)
                         else report
                     }
                 )
-
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    error = e.message ?: "Error al actualizar"
-                )
+                android.util.Log.e("AdminVM", "Error: ${e.message}", e)
             } finally {
+                android.util.Log.d("AdminVM", "finally ejecutado")
                 _uiState.value = _uiState.value.copy(updatingId = null)
             }
         }
     }
-
     fun deleteReport(reportId: Long) {
         viewModelScope.launch {
             try {

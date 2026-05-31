@@ -11,10 +11,10 @@ class UpdateReportStatusUseCase(
 
     fun execute(reportId: Long, status: String) {
         val reportStatus = when (status.uppercase()) {
-            "PENDIENTE"   -> ReportStatus.PENDING
-            "IN_PROGRESS" -> ReportStatus.REJECTED
-            "RESOLVED"    -> ReportStatus.APPROVED
-            else          -> ReportStatus.PENDING
+            "PENDING"  -> ReportStatus.PENDING
+            "REJECTED" -> ReportStatus.REJECTED
+            "APPROVED" -> ReportStatus.APPROVED
+            else       -> throw RuntimeException("Estado inválido: $status")
         }
         reportRepository.updateStatus(reportId = reportId, status = reportStatus)
     }
