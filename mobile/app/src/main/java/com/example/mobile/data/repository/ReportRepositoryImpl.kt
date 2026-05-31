@@ -31,7 +31,7 @@ class ReportRepositoryImpl @Inject constructor(
                 description         = report.description,
                 latitude            = report.location.latitude,
                 longitude           = report.location.longitude,
-                approximateLocation = null,
+                approximateLocation = report.approximateLocation,
                 category            = null
             )
             val reportJson = Gson().toJson(reportRequest)

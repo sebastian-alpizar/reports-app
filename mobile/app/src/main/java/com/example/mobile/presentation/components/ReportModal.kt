@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ReportModal(
     currentLocation: Location?,
+    currentAddress: String?,
     isSubmitting: Boolean,
     snackbarState: SnackbarState,
     reportFormState: ReportFormState,
@@ -118,7 +119,7 @@ fun ReportModal(
                     .clip(RoundedCornerShape(32.dp))
                     .then(GlassModifiers.glassCard())
             ) {
-                // Botón de cerrar (X) en la esquina superior derecha
+
                 IconButton(
                     onClick = onDismiss,
                     modifier = Modifier
@@ -143,13 +144,13 @@ fun ReportModal(
                 ) {
                     // Título
                     Text(
-                        text = "Reportar Accidente",
+                        text = "Reportar Incidente",
                         fontWeight = FontWeight.Bold,
                         color =   Color(0xFF7C3AED),
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    // Ubicación actual
+                    //  Muestra dirección si está disponible, coordenadas si no
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -175,12 +176,14 @@ fun ReportModal(
                                     color = Color.White
                                 )
                                 Text(
-                                    text = if (currentLocation != null)
-                                        "${currentLocation.latitude}, ${currentLocation.longitude}"
-                                    else
-                                        "Obteniendo ubicación...",
+                                    text = when {
+                                        currentAddress != null -> currentAddress
+                                        currentLocation != null -> "${currentLocation.latitude}, ${currentLocation.longitude}"
+                                        else -> "Obteniendo ubicación..."
+                                    },
                                     fontSize = 13.sp,
-                                    color = Color(0xFF7C3AED)
+                                    color    = Color(0xFF7C3AED)
+
                                 )
                             }
                         }

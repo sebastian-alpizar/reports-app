@@ -19,6 +19,7 @@ import com.example.mobile.domain.usecase.UpdateReportUseCase
 import com.example.mobile.domain.usecase.VoteReportUseCase
 import com.example.mobile.domain.usecase.location.GetLocationUpdatesUseCase
 import com.example.mobile.domain.usecase.location.HasLocationPermissionUseCase
+import com.example.mobile.domain.usecase.location.ReverseGeocodeUseCase
 import com.example.mobile.presentation.utils.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val currentLocation: Location? = null,
+    val currentAddress: String? = null,
     val isLoading: Boolean = true,
     val shouldRequestPermission: Boolean = false,
     val showReportModal: Boolean = false,
@@ -57,6 +59,7 @@ class HomeViewModel @Inject constructor(
     private val getNearbyReportsUseCase: GetNearbyReportsUseCase,
     private val tokenManager: TokenManager,
     private val voteReportUseCase: VoteReportUseCase
+    private val reverseGeocodeUseCase: ReverseGeocodeUseCase,
 ) : ViewModel() {
 
     var uiState by mutableStateOf(HomeUiState())
@@ -110,6 +113,19 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
+
+    fun loadCurrentAddress(context: Context) {
+        val location = uiState.currentLocation ?: return
+        viewModelScope.launch {
+            val address = reverseGeocodeUseCase(
+                context = context,
+                latitude = location.latitude,
+                longitude = location.longitude
+            )
+            uiState = uiState.copy(currentAddress = address)
+        }
+    }
+
 
     fun loadNearbyReports(latitude: Double?, longitude: Double?) {
         viewModelScope.launch {
@@ -183,10 +199,18 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             reportFormState = reportFormState.copy(isSubmitting = true)
+            // val report = CreateReportDto(
+
+            val approximateLocation = reverseGeocodeUseCase(
+                context   = context,
+                latitude  = currentLocation.latitude,
+                longitude = currentLocation.longitude
+            )
             val report = CreateReportDto(
                 location    = currentLocation,
                 description = reportFormState.description,
-                imageUri    = reportFormState.selectedImageUri
+                imageUri    = reportFormState.selectedImageUri,
+                approximateLocation = approximateLocation
             )
             val result = sendReportUseCase(context, report)
             println("RESULTADO: $result")
