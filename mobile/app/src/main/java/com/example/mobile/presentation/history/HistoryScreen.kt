@@ -31,8 +31,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import com.example.mobile.data.remote.dto.ReportResponse
-import com.example.mobile.domain.model.Report
 import com.example.mobile.presentation.components.AppBackground
 import com.example.mobile.presentation.utils.DateFormatter
 
@@ -41,7 +43,7 @@ private val AccentPurple      = Color(0xFF7C3AED)
 private val AccentPurpleLight = Color(0xFF9F67FA)
 private val CardBg            = Color.White.copy(alpha = 0.5f)
 
-// ── ENUM DE ESTADOS (igual que AdminScreen) ───────────────────────────────────
+// ── ENUM DE ESTADOS ───────────────────────────────────────────────────────────
 private enum class ReportStatus(
     val apiValue : String,
     val label    : String,
@@ -170,7 +172,27 @@ fun HistoryScreen(
 
 // ── CARD ──────────────────────────────────────────────────────────────────────
 @Composable
-private fun ReportCard(report: Report) {
+private fun ReportCard(report: ReportResponse) {
+    var showFullImage by remember { mutableStateOf(false) }
+
+    // Dialog para ver foto en grande
+    if (showFullImage && report.photoUrl != null) {
+        AlertDialog(
+            onDismissRequest = { showFullImage = false },
+            confirmButton = {},
+            text = {
+                AsyncImage(
+                    model              = report.photoUrl,
+                    contentDescription = "Foto ampliada",
+                    contentScale       = ContentScale.Fit,
+                    modifier           = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,27 +200,75 @@ private fun ReportCard(report: Report) {
             .background(CardBg)
     ) {
         Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(
-                            Brush.linearGradient(listOf(AccentPurpleLight, AccentPurple))
-                        ),
-                    contentAlignment = Alignment.Center
+
+            // ── FOTO ─────────────────────────────────────
+            val photoUrl = report.photoUrl
+            android.util.Log.d("HistoryCard", "Rendering card ${report.id} - photoUrl: $photoUrl")
+
+            if (!photoUrl.isNullOrBlank()) {
+                SubcomposeAsyncImage(
+                    model              = photoUrl,
+                    contentDescription = "Foto del reporte",
+                    contentScale       = ContentScale.Crop,
+                    modifier           = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .clickable { showFullImage = true }
                 ) {
-                    Icon(
-                        Icons.Default.Description,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    when (painter.state) {
+                        is AsyncImagePainter.State.Loading -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .background(Color.Gray.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = AccentPurple,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                        is AsyncImagePainter.State.Error -> {
+                            android.util.Log.e("HistoryCard", "Error cargando imagen: $photoUrl")
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .background(Color.Gray.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.BrokenImage,
+                                    contentDescription = null,
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(40.dp)
+                                )
+                            }
+                        }
+                        else -> SubcomposeAsyncImageContent()
+                    }
                 }
+            }
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                Brush.linearGradient(listOf(AccentPurpleLight, AccentPurple))
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Description, contentDescription = null, tint = Color.White)
+                    }
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text       = report.description,
                         color      = Color.Black.copy(alpha = 0.7f),
@@ -206,7 +276,6 @@ private fun ReportCard(report: Report) {
                         lineHeight = 18.sp
                     )
                 }
-            }
 
                 Spacer(modifier = Modifier.height(14.dp))
                 HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
@@ -225,6 +294,7 @@ private fun ReportCard(report: Report) {
                     )
                 }
             }
+        }
     }
 }
 

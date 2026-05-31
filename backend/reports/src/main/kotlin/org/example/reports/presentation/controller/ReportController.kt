@@ -50,11 +50,9 @@ class ReportController(
                 .body(ApiResponse(message = e.message ?: "Error al validar la foto"))
         }
     }
-
     @GetMapping
     fun getAll(): List<ReportResponse> {
         val result = reportQueryService.getAllReports()
-        println(result)
         return result.map(mapper::toResponse)
     }
 

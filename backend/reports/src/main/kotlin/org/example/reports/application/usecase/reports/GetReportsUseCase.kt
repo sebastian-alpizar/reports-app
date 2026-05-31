@@ -5,7 +5,6 @@ import org.example.reports.domain.model.Report
 import org.example.reports.domain.model.ReportStatus
 import org.example.reports.domain.repository.PhotoRepository
 import org.example.reports.domain.repository.ReportRepository
-import org.example.reports.domain.repository.UserRepository
 import org.example.reports.domain.repository.VoteRepository
 import org.example.reports.infrastructure.security.SpringSecurityUserProvider
 import org.springframework.stereotype.Service
@@ -21,7 +20,7 @@ class GetReportsUseCase(
         val currentUserId = authProvider.getCurrentUserId()
 
         return reportRepository.findAll()
-            .map { it.toMetadata(currentUserId) }
+            .map { it.withPhoto().toMetadata(currentUserId) }
             .sortedWith(
                 compareBy<ReportWithMetadata> {
                     when (it.report.status) {
@@ -42,6 +41,7 @@ class GetReportsUseCase(
         val currentUserId = authProvider.getCurrentUserId()
 
         return reportRepository.findById(id)
+            ?.withPhoto()
             ?.toMetadata(currentUserId)
             ?: throw RuntimeException("Reporte no encontrado")
     }
@@ -49,16 +49,13 @@ class GetReportsUseCase(
     fun getReportsByUser(userId: Long): List<ReportWithMetadata> {
         val currentUserId = authProvider.getCurrentUserId()
         return reportRepository.findByUserId(userId)
-            .map { it.toMetadata(currentUserId) }
+            .map { it.withPhoto().toMetadata(currentUserId) }
     }
 
     fun getNearbyReports(lat: Double, lng: Double, radiusKm: Double = 5.0): List<ReportWithMetadata> {
         val currentUserId = authProvider.getCurrentUserId()
-        return reportRepository.findNearby(
-            lat,
-            lng,
-            radiusKm
-        ).map { it.withPhoto().toMetadata(currentUserId) }
+        return reportRepository.findNearby(lat, lng, radiusKm)
+            .map { it.withPhoto().toMetadata(currentUserId) }
     }
 
     private fun Report.withPhoto(): Report {
@@ -74,21 +71,9 @@ class GetReportsUseCase(
     )
 
     private fun Report.toMetadata(userId: Long): ReportWithMetadata {
-
-        val affectedUsers =
-            voteRepository.countByReportId(id)
-
-        val priorityLevel =
-            PriorityCalculator.getLabel(
-                this,
-                affectedUsers
-            )
-
-        val userHasVoted =
-            voteRepository.existsByReportIdAndUserId(
-                id,
-                userId
-            )
+        val affectedUsers = voteRepository.countByReportId(id)
+        val priorityLevel = PriorityCalculator.getLabel(this, affectedUsers)
+        val userHasVoted = voteRepository.existsByReportIdAndUserId(id, userId)
 
         return ReportWithMetadata(
             report = this,
