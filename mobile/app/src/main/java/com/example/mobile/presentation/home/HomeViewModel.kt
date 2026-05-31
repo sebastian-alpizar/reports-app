@@ -161,19 +161,6 @@ class HomeViewModel @Inject constructor(
         uiState = uiState.copy(editingReport = report, showReportModal = true)
     }
 
-    fun onDeleteReport(report: Report) {
-        viewModelScope.launch {
-            deleteReportUseCase(report.id)
-                .onSuccess {
-                    uiState = uiState.copy(selectedReport = null)
-                    _event.emit(UiEvent.ShowSnackbar("Reporte eliminado", false))
-                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
-                }
-                .onFailure { error ->
-                    _event.emit(UiEvent.ShowSnackbar(error.message ?: "Error al eliminar", true))
-                }
-        }
-    }
 
     fun toggleReportModal(show: Boolean) {
         if (!show) reportFormState = ReportFormState()
@@ -323,5 +310,23 @@ class HomeViewModel @Inject constructor(
                 }
             uiState = uiState.copy(isLoading = false)
         }
+    }
+
+    fun onDeleteReport(report: Report) {
+        viewModelScope.launch {
+            deleteReportUseCase(report.id)
+                .onSuccess {
+                    android.util.Log.d("HomeVM", "Reporte eliminado, recargando mapa...")  // ← aquí
+                    uiState = uiState.copy(selectedReport = null)
+                    _event.emit(UiEvent.ShowSnackbar("Reporte eliminado", false))
+                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
+                }
+                .onFailure { error ->
+                    _event.emit(UiEvent.ShowSnackbar(error.message ?: "Error al eliminar", true))
+                }
+        }
+    }
+    fun refreshReports() {
+        uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
     }
 }

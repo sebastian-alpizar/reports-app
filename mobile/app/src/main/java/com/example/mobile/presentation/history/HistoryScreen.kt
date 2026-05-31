@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -179,7 +180,8 @@ private fun ReportCard(report: ReportResponse) {
     if (showFullImage && report.photoUrl != null) {
         AlertDialog(
             onDismissRequest = { showFullImage = false },
-            confirmButton = {},
+            confirmButton    = {},
+            containerColor   = CardBg,
             text = {
                 AsyncImage(
                     model              = report.photoUrl,
@@ -203,7 +205,6 @@ private fun ReportCard(report: ReportResponse) {
 
             // ── FOTO ─────────────────────────────────────
             val photoUrl = report.photoUrl
-            android.util.Log.d("HistoryCard", "Rendering card ${report.id} - photoUrl: $photoUrl")
 
             if (!photoUrl.isNullOrBlank()) {
                 SubcomposeAsyncImage(
@@ -226,13 +227,12 @@ private fun ReportCard(report: ReportResponse) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(
-                                    color = AccentPurple,
+                                    color    = AccentPurple,
                                     modifier = Modifier.size(32.dp)
                                 )
                             }
                         }
                         is AsyncImagePainter.State.Error -> {
-                            android.util.Log.e("HistoryCard", "Error cargando imagen: $photoUrl")
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -243,7 +243,7 @@ private fun ReportCard(report: ReportResponse) {
                                 Icon(
                                     Icons.Default.BrokenImage,
                                     contentDescription = null,
-                                    tint = Color.Gray,
+                                    tint     = Color.Gray,
                                     modifier = Modifier.size(40.dp)
                                 )
                             }
