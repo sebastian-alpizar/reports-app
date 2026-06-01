@@ -240,7 +240,7 @@ class HomeViewModel @Inject constructor(
                 onSuccess = {
                     _event.emit(UiEvent.ShowSnackbar("Reporte actualizado exitosamente", false))
                     toggleReportModal(false)
-                    //uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
+                    uiState.currentLocation?.let { loadNearbyReports(it.latitude, it.longitude) }
                 },
                 onFailure = { error ->
                     _event.emit(UiEvent.ShowSnackbar("Error al actualizar: ${error.message}", true))
