@@ -31,7 +31,12 @@ class LocationRepositoryImpl @Inject constructor(
     override suspend fun getCurrentLocation(): Location? {
         return if (hasLocationPermission()) {
             try {
-                val location = fusedLocationClient.lastLocation.await()
+//                val location = fusedLocationClient.lastLocation.await()
+                val location = fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    null
+                ).await()
+
                 location?.let {
                     Location(
                         latitude = it.latitude,
@@ -48,18 +53,80 @@ class LocationRepositoryImpl @Inject constructor(
         }
     }
 
+//    override fun getLocationUpdates(): Flow<Location> = callbackFlow {
+//        if (!hasLocationPermission()) {
+//            close(Exception("Location permission not granted"))
+//            return@callbackFlow
+//        }
+//
+//        val locationRequest = LocationRequest.Builder(
+//            Priority.PRIORITY_HIGH_ACCURACY,
+//            1000L // 1 segundo
+//        ).apply {
+//            setMinUpdateIntervalMillis(500L) // 0.5 segundos
+//            setMaxUpdateDelayMillis(2000L) // 2 segundos máximo
+//        }.build()
+//
+//        val locationCallback = object : LocationCallback() {
+//            override fun onLocationResult(locationResult: LocationResult) {
+//                locationResult.lastLocation?.let { location ->
+//                    trySend(
+//                        Location(
+//                            latitude = location.latitude,
+//                            longitude = location.longitude,
+//                            accuracy = location.accuracy,
+//                            timestamp = location.time
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//
+//        fusedLocationClient.requestLocationUpdates(
+//            locationRequest,
+//            locationCallback,
+//            null
+//        ).addOnFailureListener { exception ->
+//            close(exception)
+//        }
+//
+//        awaitClose {
+//            fusedLocationClient.removeLocationUpdates(locationCallback)
+//        }
+//    }
+
     override fun getLocationUpdates(): Flow<Location> = callbackFlow {
+
         if (!hasLocationPermission()) {
             close(Exception("Location permission not granted"))
             return@callbackFlow
         }
 
+        // 1. FORZAR primer fix
+        try {
+            val initial = fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                null
+            ).await()
+
+            initial?.let {
+                trySend(
+                    Location(
+                        latitude = it.latitude,
+                        longitude = it.longitude,
+                        accuracy = it.accuracy,
+                        timestamp = it.time
+                    )
+                )
+            }
+        } catch (_: Exception) {}
+
+        // 2. Updates continuos
         val locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
-            1000L // 1 segundo
+            1000L
         ).apply {
-            setMinUpdateIntervalMillis(500L) // 0.5 segundos
-            setMaxUpdateDelayMillis(2000L) // 2 segundos máximo
+            setMinUpdateIntervalMillis(500L)
         }.build()
 
         val locationCallback = object : LocationCallback() {
@@ -81,9 +148,7 @@ class LocationRepositoryImpl @Inject constructor(
             locationRequest,
             locationCallback,
             null
-        ).addOnFailureListener { exception ->
-            close(exception)
-        }
+        )
 
         awaitClose {
             fusedLocationClient.removeLocationUpdates(locationCallback)
