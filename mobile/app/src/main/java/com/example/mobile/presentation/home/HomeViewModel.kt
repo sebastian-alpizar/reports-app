@@ -106,10 +106,13 @@ class HomeViewModel @Inject constructor(
                     val prev = uiState.currentLocation
                     uiState = uiState.copy(currentLocation = location, isLoading = false)
 
+                    if (prev == null) {
+                        shouldCenterMap = true
+                    }
+
                     if (prev == null || distanceMeters(prev, location) > 200) {
                         loadNearbyReports(location.latitude, location.longitude)
                     }
-//                    uiState = uiState.copy(currentLocation = location, isLoading = false)
                 }
         }
     }
