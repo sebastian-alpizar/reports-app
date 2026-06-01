@@ -187,7 +187,7 @@ fun AdminScreen(
             when {
                 uiState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = AccentPurpleLight)
+                        CircularProgressIndicator(color = Color.White.copy(alpha = 0.8f))
                     }
                 }
 
@@ -378,23 +378,25 @@ fun AdminScreen(
                         if (filteredReports.isEmpty()) {
                             item {
                                 Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 48.dp),
+                                    modifier = Modifier.fillParentMaxSize(),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
                                         Icon(
                                             Icons.Default.SearchOff,
                                             contentDescription = null,
-                                            tint     = Color.White.copy(alpha = 0.25f),
-                                            modifier = Modifier.size(40.dp)
+                                            tint = Color.White,
+                                            modifier = Modifier.size(70.dp)
                                         )
-                                        Spacer(Modifier.height(10.dp))
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
                                         Text(
-                                            text     = "Sin resultados",
-                                            fontSize = 14.sp,
-                                            color    = Color.White.copy(alpha = 0.4f)
+                                            text = "Sin resultados",
+                                            color = Color.White,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     }
                                 }
@@ -448,7 +450,7 @@ fun AdminReportCard(
     ) {
         Column {
 
-            // ── ICONO + DESCRIPCIÓN ───────────────────────
+            // ── ICONO + DESCRIPCIÓN + BOTÓN ELIMINAR ──────
             Row(verticalAlignment = Alignment.Top) {
                 Box(
                     modifier = Modifier
@@ -484,6 +486,29 @@ fun AdminReportCard(
                         )
                     }
                 }
+
+                Spacer(Modifier.width(8.dp))
+
+                // ── BOTÓN ELIMINAR (arriba a la derecha) ──
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFEF4444).copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick  = { showDialog = true },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Eliminar",
+                            tint     = Color(0xFFEF4444),
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                }
             }
 
             // ── IMAGEN SIEMPRE VISIBLE ────────────────────
@@ -504,7 +529,7 @@ fun AdminReportCard(
             HorizontalDivider(color = Color.Black.copy(alpha = 0.08f))
             Spacer(Modifier.height(11.dp))
 
-            // ── FOOTER: ESTADO + FECHA + ACCIONES ────────
+            // ── FOOTER: ESTADO + FECHA + EXPANDIR ────────
             Row(
                 modifier              = Modifier.fillMaxWidth(),
                 verticalAlignment     = Alignment.CenterVertically,
@@ -632,32 +657,10 @@ fun AdminReportCard(
                             )
                         }
                     }
-
-                    Spacer(Modifier.width(6.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFEF4444).copy(alpha = 0.1f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        IconButton(
-                            onClick  = { showDialog = true },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Eliminar",
-                                tint     = Color(0xFFEF4444),
-                                modifier = Modifier.size(15.dp)
-                            )
-                        }
-                    }
                 }
             }
 
-            // ── DETALLE EXPANDIBLE (sin imagen, ya está arriba) ──────────
+            // ── DETALLE EXPANDIBLE ────────────────────────
             AnimatedVisibility(
                 visible = detailExpanded,
                 enter   = expandVertically(),

@@ -33,15 +33,15 @@ class CreateReportUseCase(
         val user = userRepository.findByEmail(email)
             ?: throw RuntimeException("Usuario no encontrado")
 
-//        val analysis = geminiService.analyzeReport(
-//            photo = photo,
-//            description = request.description
-//        )
-//        if (!analysis.valid) {
-//            throw RuntimeException(
-//                "La imagen no es apta para la plataforma"
-//            )
-//        }
+        val analysis = geminiService.analyzeReport(
+            photo = photo,
+            description = request.description
+        )
+        if (!analysis.valid) {
+            throw RuntimeException(
+                "La imagen no es apta para la plataforma"
+            )
+        }
 
         val photoUrl = try {
             cloudinaryService.uploadPhoto(photo)
@@ -67,7 +67,7 @@ class CreateReportUseCase(
             createNotificationUseCase.execute(
                 userId = admin.id,
                 title = "Nuevo reporte creado",
-                message = "Se creó un nuevo reporte: ${savedReport.description}",
+                message = "Se creó un nuevo reporte: ${savedReport.description}, categoria: ${savedReport.category}",
                 reportId = savedReport.id
             )
         }

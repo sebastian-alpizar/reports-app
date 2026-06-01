@@ -144,29 +144,27 @@ fun ReportMapView(
 }
 
 private fun createReportIcon(): Bitmap {
-    val size = 64
+    val size = 96 // antes 64 → más grande para mejor hitbox
 
     val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bmp)
 
-    // Sombra
     val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = android.graphics.Color.argb(80, 0, 0, 0)
+        color = android.graphics.Color.argb(70, 0, 0, 0)
     }
 
     canvas.drawRoundRect(
         RectF(
-            size * 0.08f + 4f,
-            size * 0.08f + 6f,
-            size * 0.92f + 4f,
-            size * 0.92f + 6f
+            size * 0.08f + 5f,
+            size * 0.08f + 7f,
+            size * 0.92f + 5f,
+            size * 0.92f + 7f
         ),
-        size * 0.22f,
-        size * 0.22f,
+        size * 0.25f,
+        size * 0.25f,
         shadowPaint
     )
 
-    // Fondo principal
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     paint.color = Color(0xFFF59E0B).toArgb()
 
@@ -177,19 +175,18 @@ private fun createReportIcon(): Bitmap {
             size * 0.92f,
             size * 0.92f
         ),
-        size * 0.22f,
-        size * 0.22f,
+        size * 0.25f,
+        size * 0.25f,
         paint
     )
 
-    // Símbolo blanco
     paint.color = Color.White.toArgb()
-    paint.strokeWidth = size * 0.09f
+    paint.strokeWidth = size * 0.08f
     paint.strokeCap = Paint.Cap.ROUND
 
     canvas.drawLine(
         size / 2f,
-        size * 0.27f,
+        size * 0.25f,
         size / 2f,
         size * 0.58f,
         paint
@@ -197,8 +194,8 @@ private fun createReportIcon(): Bitmap {
 
     canvas.drawCircle(
         size / 2f,
-        size * 0.74f,
-        size * 0.05f,
+        size * 0.75f,
+        size * 0.06f,
         paint
     )
 

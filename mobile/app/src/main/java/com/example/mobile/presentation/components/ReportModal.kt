@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -43,6 +44,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -146,11 +148,11 @@ fun ReportModal(
                     Text(
                         text = "Reportar Incidente",
                         fontWeight = FontWeight.Bold,
-                        color =   Color(0xFF7C3AED),
+                        color = Color(0xFF7C3AED),
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    //  Muestra dirección si está disponible, coordenadas si no
+                    // Muestra dirección si está disponible, coordenadas si no
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -182,8 +184,7 @@ fun ReportModal(
                                         else -> "Obteniendo ubicación..."
                                     },
                                     fontSize = 13.sp,
-                                    color    = Color(0xFF7C3AED)
-
+                                    color = Color(0xFF7C3AED)
                                 )
                             }
                         }
@@ -221,6 +222,8 @@ fun ReportModal(
                             // Botón Cámara
                             OutlinedButton(
                                 onClick = {
+                                    // Limpiar la imagen seleccionada actual antes de tomar nueva
+                                    onImageSelected(null)
                                     handleCameraClick(
                                         context = context,
                                         permissionState = cameraPermissionState,
@@ -242,12 +245,18 @@ fun ReportModal(
                                     tint = Color(0xFF7C3AED)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Cámara", color = Color.White.copy(alpha = 0.8f))
+                                Text(
+                                    "Cámara",
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
 
                             // Botón Galería
                             OutlinedButton(
                                 onClick = {
+                                    onImageSelected(null)
                                     handleGalleryClick(
                                         permissionState = galleryPermissionState,
                                         launcher = galleryLauncher
@@ -265,7 +274,12 @@ fun ReportModal(
                                     tint = Color(0xFF7C3AED)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Galería", color = Color.White.copy(alpha = 0.8f))
+                                Text(
+                                    "Galería",
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                         }
                         reportFormState.imageError?.let {
@@ -333,6 +347,7 @@ fun ReportModal(
         }
     }
 }
+
 private fun handleGalleryClick(
     permissionState: PermissionState,
     launcher: ManagedActivityResultLauncher<String, Uri?>
@@ -351,9 +366,11 @@ private fun handleCameraClick(
     onTempUriCreated: (Uri) -> Unit
 ) {
     if (permissionState.status.isGranted) {
-        val file = java.io.File(
+        // Generar nombre único con timestamp
+        val timestamp = System.currentTimeMillis()
+        val file = File(
             context.cacheDir,
-            "temp_camera_image.jpg"
+            "temp_camera_image_$timestamp.jpg"
         )
 
         val uri = FileProvider.getUriForFile(
@@ -365,7 +382,20 @@ private fun handleCameraClick(
         onTempUriCreated(uri)
         launcher.launch(uri)
 
+        // Limpiar archivos temporales antiguos (mayores a 24 horas)
+        cleanOldTempImages(context)
     } else {
         permissionState.launchPermissionRequest()
+    }
+}
+
+// Función para limpiar archivos temporales viejos
+private fun cleanOldTempImages(context: Context, maxAge: Long = 24 * 60 * 60 * 1000) {
+    val cacheDir = context.cacheDir
+    val now = System.currentTimeMillis()
+    cacheDir.listFiles()?.forEach { file ->
+        if (file.name.startsWith("temp_camera_image_") && now - file.lastModified() > maxAge) {
+            file.delete()
+        }
     }
 }

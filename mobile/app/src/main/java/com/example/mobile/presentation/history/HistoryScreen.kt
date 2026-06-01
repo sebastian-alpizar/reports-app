@@ -147,19 +147,53 @@ fun HistoryScreen(
                     }
                 }
 
-                uiState.error != null -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = uiState.error ?: "", color = Color.Black)
+                // uiState.error != null -> {
+                //     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                //         Text(text = uiState.error ?: "", color = Color.Black)
+                //     }
+                // }
+
+                uiState.reports.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                            Icon(
+                                Icons.Default.Inbox,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(70.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = "No tienes reportes",
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Text(
+                                text = "Los nuevos reportes aparecerán aquí",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 13.sp
+                            )
+                        }
                     }
                 }
 
                 else -> {
                     LazyColumn(
-                        modifier            = Modifier
+                        modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 10.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding      = PaddingValues(bottom = 24.dp)
+                        contentPadding = PaddingValues(bottom = 24.dp)
                     ) {
                         items(uiState.reports) { report ->
                             ReportCard(report)

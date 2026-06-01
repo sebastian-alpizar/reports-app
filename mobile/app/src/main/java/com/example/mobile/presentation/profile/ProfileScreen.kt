@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -270,14 +269,15 @@ fun ProfileScreen(
                                         modifier = Modifier.fillMaxSize(),
                                         contentAlignment = Alignment.Center
                                     ) {
+                                        // ── Card limpia, sin borde morado ─────
                                         Column(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(horizontal = 22.dp)
-                                                .shadow(20.dp, RoundedCornerShape(28.dp), spotColor = Color.Black.copy(alpha = 0.25f))
                                                 .clip(RoundedCornerShape(28.dp))
                                                 .background(CardBgSolid)
                                         ) {
+
                                             // ── Encabezado ───────────────────
                                             Column(
                                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -338,33 +338,48 @@ fun ProfileScreen(
 
                                             HorizontalDivider(color = Color.Black.copy(alpha = 0.07f))
 
-                                            // ── Guardar ──────────────────────
-                                            TextButton(
-                                                onClick = {
-                                                    viewModel.updateUser(
-                                                        name       = if (editingField == "name")       fieldValue else nameField,
-                                                        email      = if (editingField == "email")      fieldValue else emailField,
-                                                        nationalId = if (editingField == "nationalId") fieldValue else nationalIdField
-                                                    )
-                                                },
-                                                modifier = Modifier.fillMaxWidth().height(56.dp),
-                                                enabled  = !uiState.isSaving
+                                            // ── Botones lado a lado ───────────
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(56.dp)
                                             ) {
-                                                if (uiState.isSaving) {
-                                                    CircularProgressIndicator(color = AccentPurple, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
-                                                } else {
-                                                    Text("Guardar", color = AccentPurple, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                                // Cancelar
+                                                TextButton(
+                                                    onClick  = { editingField = null; viewModel.clearSaveError() },
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .fillMaxHeight()
+                                                ) {
+                                                    Text("Cancelar", color = TextSecondary, fontWeight = FontWeight.Medium, fontSize = 15.sp)
                                                 }
-                                            }
 
-                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.07f))
+                                                // Divisor vertical
+                                                VerticalDivider(
+                                                    color     = Color.Black.copy(alpha = 0.07f),
+                                                    thickness = 0.5.dp
+                                                )
 
-                                            // ── Cancelar ─────────────────────
-                                            TextButton(
-                                                onClick  = { editingField = null; viewModel.clearSaveError() },
-                                                modifier = Modifier.fillMaxWidth().height(56.dp)
-                                            ) {
-                                                Text("Cancelar", color = TextSecondary, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                                                // Guardar
+                                                TextButton(
+                                                    onClick = {
+                                                        viewModel.updateUser(
+                                                            name       = if (editingField == "name")       fieldValue else nameField,
+                                                            email      = if (editingField == "email")      fieldValue else emailField,
+                                                            nationalId = if (editingField == "nationalId") fieldValue else nationalIdField
+                                                        )
+                                                    },
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .fillMaxHeight(),
+                                                    enabled  = !uiState.isSaving
+                                                ) {
+                                                    if (uiState.isSaving) {
+                                                        CircularProgressIndicator(color = AccentPurple, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                                                    } else {
+                                                        Text("Guardar", color = AccentPurple, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                                    }
+                                                }
                                             }
                                         }
                                     }
