@@ -143,7 +143,7 @@ fun ReportModal(
                 // Contenido principal con scroll
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(28.dp)
                         .padding(top = 8.dp)
                         .verticalScroll(rememberScrollState()), // Scroll añadido
