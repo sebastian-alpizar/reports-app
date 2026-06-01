@@ -30,7 +30,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.presentation.components.AppBackground
+import com.example.mobile.presentation.components.snackbar.AppSnackbar
+import com.example.mobile.presentation.components.snackbar.SnackbarState
 import com.example.mobile.presentation.utils.DateFormatter
+import com.example.mobile.presentation.utils.UiEvent
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 // ── COLORES ───────────────────────────────────────────────────────────────────
 private val AccentPurple      = Color(0xFF7C3AED)
@@ -84,9 +89,21 @@ fun AdminScreen(
     navController: NavController,
     viewModel: AdminViewModel = hiltViewModel()
 ) {
+    val snackbarState = remember { SnackbarState() }
+    val scope = rememberCoroutineScope()
+
     val uiState        by viewModel.uiState.collectAsState()
     var searchQuery    by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf<ReportStatus?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> snackbarState.show(event.message, event.isError)
+                else -> {}
+            }
+        }
+    }
 
     val filteredReports = remember(uiState.reports, searchQuery, selectedFilter) {
         uiState.reports
@@ -174,11 +191,11 @@ fun AdminScreen(
                     }
                 }
 
-                uiState.error != null -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(uiState.error ?: "", color = Color.Black)
-                    }
-                }
+//                uiState.error != null -> {
+//                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                        Text( "Error al cargar reportes", color = Color.Black)
+//                    }
+//                }
 
                 else -> {
                     LazyColumn(
@@ -396,6 +413,15 @@ fun AdminScreen(
                 }
             }
         }
+
+        AppSnackbar(
+            message = snackbarState.message,
+            isError = snackbarState.isError,
+            visible = snackbarState.isVisible,
+            onDismiss = {
+                scope.launch { snackbarState.dismiss() }
+            }
+        )
     }
 }
 
@@ -655,7 +681,7 @@ fun AdminReportCard(
             if (isLoading) {
                 Spacer(Modifier.height(8.dp))
                 CircularProgressIndicator(
-                    color       = AccentPurpleLight,
+                    color       = Color.White.copy(alpha = 0.8f),
                     modifier    = Modifier.size(20.dp),
                     strokeWidth = 2.dp
                 )

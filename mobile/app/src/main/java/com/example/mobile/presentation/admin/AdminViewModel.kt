@@ -6,9 +6,12 @@ import com.example.mobile.core.util.TokenManager
 import com.example.mobile.data.remote.api.ReportApi
 import com.example.mobile.data.remote.dto.ReportResponse
 import com.example.mobile.data.remote.dto.UpdateStatusRequest
+import com.example.mobile.presentation.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,6 +33,9 @@ class AdminViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState: StateFlow<AdminUiState> = _uiState.asStateFlow()
 
+    private val _event = MutableSharedFlow<UiEvent>()
+    val event = _event.asSharedFlow()
+
     init {
         loadAllReports()
     }
@@ -37,7 +43,6 @@ class AdminViewModel @Inject constructor(
     fun loadAllReports() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-
             try {
                 val reports = reportApi.getAllReports()
                 _uiState.value = _uiState.value.copy(
@@ -49,6 +54,7 @@ class AdminViewModel @Inject constructor(
                     isLoading = false,
                     error = e.message ?: "Error desconocido"
                 )
+                _event.emit(UiEvent.ShowSnackbar("Error al cargar reportes", true))
             }
         }
     }
@@ -87,11 +93,12 @@ class AdminViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     reports = _uiState.value.reports.filter { it.id != reportId }
                 )
-
+                _event.emit(UiEvent.ShowSnackbar("Reporte eliminado", false))
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     error = e.message ?: "Error al eliminar"
                 )
+                _event.emit(UiEvent.ShowSnackbar("Error al eliminar el reporte", true))
             } finally {
                 _uiState.value = _uiState.value.copy(deletingId = null)
             }

@@ -50,7 +50,7 @@ fun StatisticsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = Color.White,
+                            color = Color.White.copy(alpha = 0.8f),
                         )
                     }
                 }

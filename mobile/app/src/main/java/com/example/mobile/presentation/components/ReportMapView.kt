@@ -148,9 +148,26 @@ private fun createReportIcon(): Bitmap {
 
     val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bmp)
-    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    // Fondo
+    // Sombra
+    val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.argb(80, 0, 0, 0)
+    }
+
+    canvas.drawRoundRect(
+        RectF(
+            size * 0.08f + 4f,
+            size * 0.08f + 6f,
+            size * 0.92f + 4f,
+            size * 0.92f + 6f
+        ),
+        size * 0.22f,
+        size * 0.22f,
+        shadowPaint
+    )
+
+    // Fondo principal
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     paint.color = Color(0xFFF59E0B).toArgb()
 
     canvas.drawRoundRect(
@@ -170,7 +187,6 @@ private fun createReportIcon(): Bitmap {
     paint.strokeWidth = size * 0.09f
     paint.strokeCap = Paint.Cap.ROUND
 
-    // Línea vertical
     canvas.drawLine(
         size / 2f,
         size * 0.27f,
@@ -179,7 +195,6 @@ private fun createReportIcon(): Bitmap {
         paint
     )
 
-    // Punto
     canvas.drawCircle(
         size / 2f,
         size * 0.74f,

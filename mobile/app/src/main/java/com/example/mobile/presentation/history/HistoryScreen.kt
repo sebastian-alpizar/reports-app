@@ -143,7 +143,7 @@ fun HistoryScreen(
             when {
                 uiState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color.White)
+                        CircularProgressIndicator(color = Color.White.copy(alpha = 0.8f))
                     }
                 }
 
