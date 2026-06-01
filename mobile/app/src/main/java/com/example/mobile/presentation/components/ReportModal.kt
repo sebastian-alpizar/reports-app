@@ -12,7 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
@@ -120,6 +122,7 @@ fun ReportModal(
                     .padding(24.dp)
                     .clip(RoundedCornerShape(32.dp))
                     .then(GlassModifiers.glassCard())
+                    .heightIn(max = 600.dp) // Altura máxima
             ) {
 
                 IconButton(
@@ -137,11 +140,13 @@ fun ReportModal(
                     )
                 }
 
-                // Contenido principal
+                // Contenido principal con scroll
                 Column(
                     modifier = Modifier
+                        .fillMaxSize()
                         .padding(28.dp)
-                        .padding(top = 8.dp), // Espacio extra por la X
+                        .padding(top = 8.dp)
+                        .verticalScroll(rememberScrollState()), // Scroll añadido
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Título
@@ -189,6 +194,8 @@ fun ReportModal(
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Campo de descripción
                     AppTextField(
@@ -337,7 +344,10 @@ fun ReportModal(
                     AppButton(
                         text = "Enviar Reporte",
                         isLoading = isSubmitting,
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                            .padding(bottom = 8.dp), // Padding inferior extra
                         enabled = currentLocation != null && !isSubmitting
                     ) {
                         onSubmit()

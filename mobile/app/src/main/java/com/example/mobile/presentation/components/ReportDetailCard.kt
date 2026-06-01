@@ -6,7 +6,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -77,8 +79,13 @@ fun ReportDetailCard(
             color = Color.White,
             shadowElevation = 8.dp
         ) {
+            // Contenido con scroll
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 600.dp) // Altura máxima similar a ReportModal
+                    .verticalScroll(rememberScrollState()) // Scroll añadido
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // ==================== HEADER ====================

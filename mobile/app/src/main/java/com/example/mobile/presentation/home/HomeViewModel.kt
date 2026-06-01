@@ -1,6 +1,7 @@
 package com.example.mobile.presentation.home
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -103,6 +104,7 @@ class HomeViewModel @Inject constructor(
                     uiState = uiState.copy(isLoading = false)
                 }
                 .collect { location ->
+                    Log.d("LOCATION_DEBUG", "Location: $location") // 👈 AQUÍ
                     val prev = uiState.currentLocation
                     uiState = uiState.copy(currentLocation = location, isLoading = false)
 

@@ -177,7 +177,7 @@ fun HomeScreen(
                             // Botón menú — mismo estilo glass del proyecto
                             Box(
                                 modifier = Modifier
-                                    .padding(start = 16.dp, top = 0.dp)
+                                    .padding(start = 16.dp, top = 16.dp)
                                     .align(Alignment.TopStart)
                                     .windowInsetsPadding(WindowInsets.statusBars)
                             ) {
