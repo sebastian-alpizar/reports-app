@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
@@ -24,7 +25,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.mobile.domain.model.PriorityLevel
 import com.example.mobile.domain.model.Report
@@ -66,81 +66,104 @@ fun ReportDetailCard(
 
         val isMyReport = currentUserId != null && report.userId == currentUserId
 
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismiss
-                ),
-            shape = RoundedCornerShape(20.dp),
-            color = Color.White,
-            shadowElevation = 8.dp
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Contenido con scroll
-            Column(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 600.dp) // Altura máxima similar a ReportModal
-                    .verticalScroll(rememberScrollState()) // Scroll añadido
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .align(Alignment.Center),
+                shape = RoundedCornerShape(20.dp),
+                color = Color.White,
+                shadowElevation = 8.dp
             ) {
-                // ==================== HEADER ====================
-                HeaderSection(
-                    category = report.category,
-                    isMyReport = isMyReport,
-                    onEdit = {
-                        onDismiss()
-                        onEditClicked(report)
-                    },
-                    onDelete = { showDeleteDialog = true }
-                )
+                Box {
+                    // Botón de cerrar (X)
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(12.dp)
+                            .size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
 
-                // ==================== MÉTRICAS ====================
-                MetricsSection(
-                    priorityLevel = report.priorityLevel,
-                    severity = report.severity,
-                    affectedUsers = report.affectedUsers
-                )
+                    // Contenido con scroll
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 600.dp)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                            .padding(top = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // ==================== HEADER ====================
+                        HeaderSection(
+                            category = report.category,
+                            isMyReport = isMyReport,
+                            onEdit = {
+                                onDismiss()
+                                onEditClicked(report)
+                            },
+                            onDelete = { showDeleteDialog = true }
+                        )
 
-                // ==================== IMAGEN ====================
-                report.photoUrl?.let { url ->
-                    ReportImage(url = url)
+                        // ==================== MÉTRICAS ====================
+                        MetricsSection(
+                            priorityLevel = report.priorityLevel,
+                            severity = report.severity,
+                            affectedUsers = report.affectedUsers
+                        )
+
+                        // ==================== IMAGEN ====================
+                        report.photoUrl?.let { url ->
+                            ReportImage(url = url)
+                        }
+
+                        // ==================== DESCRIPCIÓN ====================
+                        DescriptionSection(description = report.description)
+
+                        // ==================== UBICACIÓN ====================
+                        report.approximateLocation?.let { location ->
+                            LocationSection(location = location)
+                        }
+
+                        // ==================== ESTADO ====================
+                        report.status?.let { status ->
+                            StatusSection(status = status)
+                        }
+
+                        // ==================== BOTÓN DE VOTACIÓN ====================
+                        // Solo mostrar el botón de votar si NO es mi reporte
+                        if (!isMyReport) {
+                            VoteButton(
+                                hasVoted = report.userHasVoted,
+                                onClick = { onVoteClicked(report) },
+                                isLoading = isLoading
+                            )
+                        }
+
+                        // ==================== METADATA ====================
+                        MetadataSection(
+                            userName = report.userName,
+                            latitude = report.location.latitude,
+                            longitude = report.location.longitude
+                        )
+                    }
                 }
-
-                // ==================== DESCRIPCIÓN ====================
-                DescriptionSection(description = report.description)
-
-                // ==================== UBICACIÓN ====================
-                report.approximateLocation?.let { location ->
-                    LocationSection(location = location)
-                }
-
-                // ==================== ESTADO ====================
-                report.status?.let { status ->
-                    StatusSection(status = status)
-                }
-
-                // ==================== BOTÓN DE VOTACIÓN ====================
-                VoteButton(
-                    hasVoted = report.userHasVoted,
-                    onClick = { onVoteClicked(report) },
-                    isLoading = isLoading
-                )
-
-                // ==================== METADATA ====================
-                MetadataSection(
-                    userName = report.userName,
-                    latitude = report.location.latitude,
-                    longitude = report.location.longitude
-                )
             }
         }
     }
 }
+
 
 // ==================== COMPONENTES SECUNDARIOS ====================
 
