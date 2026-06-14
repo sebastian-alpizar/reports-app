@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.example.mobile.domain.model.PriorityLevel
 import com.example.mobile.domain.model.Report
@@ -67,13 +68,24 @@ fun ReportDetailCard(
         val isMyReport = currentUserId != null && report.userId == currentUserId
 
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismiss
+                )
         ) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .align(Alignment.Center),
+                    .align(Alignment.Center)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {} // Evita que el clic en el contenido cierre el modal
+                    ),
                 shape = RoundedCornerShape(20.dp),
                 color = Color.White,
                 shadowElevation = 8.dp
@@ -86,6 +98,7 @@ fun ReportDetailCard(
                             .align(Alignment.TopEnd)
                             .padding(12.dp)
                             .size(32.dp)
+                            .zIndex(1f)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -102,7 +115,7 @@ fun ReportDetailCard(
                             .heightIn(max = 600.dp)
                             .verticalScroll(rememberScrollState())
                             .padding(16.dp)
-                            .padding(top = 8.dp),
+                            .padding(top = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         // ==================== HEADER ====================
