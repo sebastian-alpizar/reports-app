@@ -4,14 +4,6 @@ Este proyecto consiste en una aplicación móvil Android y un backend REST para 
 
 ---
 
-## 👥 Integrantes
-
-- **Cristi**
-- **Dilanna**
-- **Sebastián**
-
----
-
 ## 🧩 Arquitectura General
 
 - **Frontend:** Android (Kotlin + Jetpack Compose)
@@ -26,8 +18,6 @@ Este proyecto consiste en una aplicación móvil Android y un backend REST para 
 
 ## 📝 Distribución de Tareas
 
-### 👩‍💻 Cristi
-
 - Diseño UI/UX en Android
 - Pantallas en Jetpack Compose
 - Navegación entre vistas
@@ -35,8 +25,6 @@ Este proyecto consiste en una aplicación móvil Android y un backend REST para 
 - Pruebas de interfaz
 
 ---
-
-### 👩‍💻 Dilanna
 
 - Lógica de negocio en Android (ViewModels)
 - Consumo de API con Retrofit
@@ -46,8 +34,6 @@ Este proyecto consiste en una aplicación móvil Android y un backend REST para 
 - Manejo de permisos
 
 ---
-
-### 👨‍💻 Sebastián
 
 - Backend en Spring Boot
 - Seguridad (OAuth2, JWT)
